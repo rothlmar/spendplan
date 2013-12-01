@@ -22,7 +22,7 @@ var datastoreManager = client.getDatastoreManager();
 $(document).ready(function() {
   $("#auth-button").on("click", function() { 
     client.authenticate();
-
+  });
 datastoreManager.openDefaultDatastore(function (error, datastore) {
   if (error) {
     alert('error opening default datastore: ' + error);
@@ -34,7 +34,6 @@ datastoreManager.openDefaultDatastore(function (error, datastore) {
   var accounts = accountTable.query();
   console.log(accounts);
   $("#table-data").html(JSON.stringify(accounts));
-});
 
 
   });
