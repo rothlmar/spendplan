@@ -1,7 +1,7 @@
 <html>
 <head>
 <script src="https://www.dropbox.com/static/api/dropbox-datastores-1.0-latest.js" type="text/javascript"></script>
-<script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 var client = new Dropbox.Client({key: "i86ppgkz7etf1vk"})
@@ -29,10 +29,11 @@ datastoreManager.openDefaultDatastore(function (error, datastore) {
   };
 
   var accountTable = datastore.getTable('accounts');
-  // var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP'}
+  // var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP });
+
   var accounts = accountTable.query();
+  console.log(accounts);
   $("#table-data").html(JSON.stringify(accounts));
-);
 });
 
 
