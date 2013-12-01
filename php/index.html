@@ -18,18 +18,24 @@ if (client.isAuthenticated()) {
 };
 
 var datastoreManager = client.getDatastoreManager();
+
+$(document).ready(function() {
+  $("#auth-button").on("click", function() { 
+    client.authenticate();
+
 datastoreManager.openDefaultDatastore(function (error, datastore) {
   if (error) {
     alert('error opening default datastore: ' + error);
   };
 
   var accountTable = datastore.getTable('accounts');
-  var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP'});
+  # var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP'}
+  var accounts = accountTable.query();
+  $("#table-data").html(JSON.stringify(accounts));
+);
 });
 
-$(document).ready(function() {
-  $("#auth-button").on("click", function() { 
-    client.authenticate();
+
   });
 })
 </script>
@@ -40,6 +46,9 @@ $(document).ready(function() {
 <p>
 This is going to be awesome.
 </p>
+<p id="table-data">
+</p>
+
 <button id="auth-button">Authenticate</button>
 </body>
 </html>
