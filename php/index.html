@@ -23,17 +23,18 @@ $(document).ready(function() {
   $("#auth-button").on("click", function() { 
     client.authenticate();
   });
-datastoreManager.openDefaultDatastore(function (error, datastore) {
-  if (error) {
-    alert('error opening default datastore: ' + error);
-  };
 
-  var accountTable = datastore.getTable('accounts');
+  datastoreManager.openDefaultDatastore(function (error, datastore) {
+    if (error) {
+      alert('error opening default datastore: ' + error);
+    };
+
+    var accountTable = datastore.getTable('accounts');
   // var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP });
 
-  var accounts = accountTable.query();
-  console.log(accounts);
-  $("#table-data").html(JSON.stringify(accounts));
+    var accounts = accountTable.query();
+    console.log(accounts);
+    $("#table-data").html(JSON.stringify(accounts));
 
 
   });
