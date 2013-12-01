@@ -1,0 +1,45 @@
+<html>
+<head>
+<script src="https://www.dropbox.com/static/api/dropbox-datastores-1.0-latest.js" type="text/javascript"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+var client = new Dropbox.Client({key: "i86ppgkz7etf1vk"})
+
+client.authenticate({interactive: false}, function(error) {
+  if (error) {
+    alert('Authentication error: ' + error);
+  }
+
+});
+
+if (client.isAuthenticated()) {
+  alert("you are authenticated!");
+};
+
+var datastoreManager = client.getDatastoreManager();
+datastoreManager.openDefaultDatastore(function (error, datastore) {
+  if (error) {
+    alert('error opening default datastore: ' + error);
+  };
+
+  var accountTable = datastore.getTable('accounts');
+  var firstAcct = accountTable.insert({acctname: 'Barclays', currency: 'GBP'});
+});
+
+$(document).ready(function() {
+  $("#auth-button").on("click", function() { 
+    client.authenticate();
+  });
+})
+</script>
+</head>
+<body>
+<h1>SpendPlan</h1>
+
+<p>
+This is going to be awesome.
+</p>
+<button id="auth-button">Authenticate</button>
+</body>
+</html>
