@@ -12,6 +12,7 @@
 <body ng-controller="SpendPlanCtrl">
 <h1>SpendPlan</h1>
 
+<h3>Accounts:</h3>
 <ul>
   <li ng-repeat="account in accounts">{{ account.get('acctname') }} ({{ account.get('currency') }})</li>
 </ul>
@@ -28,6 +29,14 @@
 <button>Add</button>
 </form>
 </div>
+
+<h3>Transactions:</h3>
+<ul>
+  <li ng-repeat="transaction in transactions">
+    <div>{{ transaction.get('Date') }} -- {{ transaction.get('Amount') }} -- {{ transaction.get('Note') }} -- {{ transaction.get('Category') }} -- {{ acctTable.get(transaction.get('Account')).get('acctname') }} ({{ acctTable.get(transaction.get('Account')).get('currency') }})
+    </div>
+  </li>
+</ul>
 
 </body>
 </html>

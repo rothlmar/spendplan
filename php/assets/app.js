@@ -7,8 +7,10 @@ app.controller('SpendPlanCtrl',
 		function SpendPlanCtrl($scope, dropstoreClient) {
 		    var _datastore = null;
 		    var _accountTable = null;
+		    var _transactionTable = null;
 		    $scope.newAcct = {name:'', curr:'USD'};
 		    $scope.accounts = [];
+		    $scope.transactions = [];
 		    dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 			.authenticate({interactive: true})
 			.then(function(datastoreManager) {
@@ -25,7 +27,11 @@ app.controller('SpendPlanCtrl',
 				}
 			    }, 'accounts');
 
+			    $scope.acctTable = _accountTable;
 			    $scope.accounts = _accountTable.query();
+
+			    _transactionTable = _datastore.getTable('transactions');
+			    $scope.transactions = _transactionTable.query();
 			});
 		    
 		    $scope.addAccount = function() {
