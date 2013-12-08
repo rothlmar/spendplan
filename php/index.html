@@ -57,7 +57,8 @@
       </div> <!-- row -->
 
       <h3>Transactions:</h3>
-      <table class="table table-responsive table-condensed table-striped">
+      <input type="text"
+      <table class="table table-responsive table-condensed">
 	<tr>
 	  <th>Date</th>
 	  <th>Amount</th>
@@ -67,7 +68,7 @@
 	</tr>
 	<tr ng-repeat="transaction in transactions | orderBy:getDate:true">
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
-	  <td>{{ transaction.get('Amount') | currency }}</td>
+	  <td class="{{ getColor(transaction) }}">{{ transaction.get('Amount') | currency }}</td>
 	  <td>{{ transaction.get('Category') }}</td>
 	  <td>{{ transaction.get('Note') }}</td>
 	  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}

@@ -49,6 +49,14 @@ app.controller('SpendPlanCtrl',
 			return transaction.get('Date')
 		    };
 
+		    $scope.getColor = function(transaction) {
+			if (transaction.get('Amount') >= 0) {
+			    return 'success';
+			} else {
+			    return 'danger';
+			}
+		    };
+
 		    $scope.getBalance = function(account) {
 			// console.log(account.getId());
 			var acct_trans = _transactionTable.query({"Account": account.getId()});
