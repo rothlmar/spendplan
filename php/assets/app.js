@@ -34,6 +34,10 @@ app.controller('SpendPlanCtrl',
 			    $scope.transactions = _transactionTable.query();
 			});
 		    
+		    $scope.getDate = function(transaction) {
+			return transaction.get('Date')
+		    };
+
 		    $scope.addAccount = function() {
 			console.log(JSON.stringify($scope.newAcct));
 			_accountTable.insert({
