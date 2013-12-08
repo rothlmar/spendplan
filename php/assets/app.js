@@ -32,10 +32,43 @@ app.controller('SpendPlanCtrl',
 
 			    _transactionTable = _datastore.getTable('transactions');
 			    $scope.transactions = _transactionTable.query();
+			    
+			    var categories = {};
+			    for (var ndx in $scope.transactions) {
+				var category = $scope.transactions[ndx];
+				var cat_name = category.get('Category');
+				if (!(cat_name in categories)) {
+				    categories[cat_name] = 0;
+				};
+				categories[cat_name] += category.get('Amount');
+			    };
+			    $scope.categories = categories;
 			});
 		    
 		    $scope.getDate = function(transaction) {
 			return transaction.get('Date')
+		    };
+
+		    $scope.getBalance = function(account) {
+			// console.log(account.getId());
+			var acct_trans = _transactionTable.query({"Account": account.getId()});
+			// console.log(acct_trans.length);
+			var total = 0.0
+			for ( var ndx in acct_trans) {
+			    total += acct_trans[ndx].get('Amount');
+			    // total += 1;
+			}
+			return total;
+		    };
+		    
+		    $scope.currSymbol = function(account) {
+			if (account.get('currency') == 'USD') {
+			    return '$';
+			} else if (account.get('currency') == 'GBP') {
+			    return '£';
+			} else {
+			    return "ERR";
+			}
 		    };
 
 		    $scope.addAccount = function() {
