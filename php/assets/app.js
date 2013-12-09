@@ -11,6 +11,14 @@ app.controller('SpendPlanCtrl',
 		    $scope.newAcct = {name:'', curr:'USD'};
 		    $scope.accounts = [];
 		    $scope.transactions = [];
+		    $scope.trans_filter = {date_min:'',
+					   date_max:'',
+					   amount_min:'',
+					   amount_max:'',
+					   category:'',
+					   note:'',
+					   account:''
+					  };
 		    dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 			.authenticate({interactive: true})
 			.then(function(datastoreManager) {
@@ -79,6 +87,43 @@ app.controller('SpendPlanCtrl',
 			}
 		    };
 
+		    $scope.catFilter = function(transaction) {
+			var cat_pat = new RegExp($scope.trans_filter.category,'gi');
+			var note_pat = new RegExp($scope.trans_filter.note,'gi');
+			var min_test = true;
+			var max_test = true;
+			if ($scope.trans_filter.amount_min != '') {
+			    min_test = (transaction.get('Amount') >= Number($scope.trans_filter.amount_min));
+			};
+			if ($scope.trans_filter.amount_max != '') {
+			    max_test = (transaction.get('Amount') <= Number($scope.trans_filter.amount_max));
+			};
+
+			var date_min = true;
+			var date_max = true;
+			if ($scope.trans_filter.date_min != '') {
+			    var date_arr = $scope.trans_filter.date_min.split('/');
+			    var date = new Date(date_arr[2],
+						    date_arr[0]-1,
+						    date_arr[1]);
+			    console.log(date);
+			    date_min = (transaction.get('Date') >= date);
+			};
+			if ($scope.trans_filter.date_max != '') {
+			    var date_arr = $scope.trans_filter.date_max.split('/');
+			    var date = new Date(date_arr[2],
+						    date_arr[0]-1,
+						    date_arr[1]);
+			    console.log(date);
+			    date_max = (transaction.get('Date') <= date);
+			};
+			
+			return cat_pat.test(transaction.get('Category')) & 
+			    note_pat.test(transaction.get('Note')) &
+			    min_test & max_test &
+			    date_min & date_max;
+		};
+		    
 		    $scope.addAccount = function() {
 			console.log(JSON.stringify($scope.newAcct));
 			_accountTable.insert({

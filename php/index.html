@@ -57,17 +57,39 @@
       </div> <!-- row -->
 
       <h3>Transactions:</h3>
-      <input type="text"
-	     ng-model="trans.filter">
       <table class="table table-responsive table-condensed">
 	<tr>
-	  <th>Date</th>
-	  <th>Amount</th>
-	  <th>Category</th>
-	  <th>Note</th>
-	  <th>Account</th>
+	  <th>
+	    Date
+	    <input type="text"
+	     ng-model="trans_filter.date_min"
+		   placeholder="min MM/DD/YYYY">
+	    <input type="text"
+		   ng-model="trans_filter.date_max"
+		   placeholder="max MM/DD/YYYY">
+	  </th>
+	  <th>Amount
+	    <input type="text"
+		   ng-model="trans_filter.amount_min"
+		   placeholder="min">
+	    <input type="text"
+		   ng-model="trans_filter.amount_max"
+		   placeholder="max">
+	  </th>
+	  <th>Category
+	    <input type="text"
+	     ng-model="trans_filter.category">
+	  </th>
+	  <th>Note
+	    <input type="text"
+	     ng-model="trans_filter.note">
+	  </th>
+	  <th>Account
+	    <input type="text"
+	     ng-model="trans_filter.account">
+	  </th>
 	</tr>
-	<tr ng-repeat="transaction in transactions | orderBy:getDate:true">
+	<tr ng-repeat="transaction in transactions | orderBy:getDate:true | filter:catFilter">
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
 	  <td class="{{ getColor(transaction) }}">{{ transaction.get('Amount') | currency }}</td>
 	  <td>{{ transaction.get('Category') }}</td>
