@@ -28,21 +28,34 @@
 	      <td>{{ account.get('acctname') }} ({{ account.get('currency') }})</td>
 	      <td>{{ getBalance(account) | currency:currSymbol(account) }}</td>
 	    </tr>
+	    <tr>
+	      <td>
+	  	<input type="text"
+	  	       placeholder="New Account"
+	  	       style="width:15em"
+	  	       ng-model="newAcct.name"> 
+		<select ng-model="newAcct.curr" style="width:6em">
+	  	  <option value="GBP">GBP</option>
+	  	  <option value="USD">USD</option>
+		</select>
+	      <button ng-click="addAccount()" class="btn btn-default">Add</button>
+	      </td>
+	    </tr>
 	  </table>
-	  <div>
-	    <form class="form-inline" ng-submit="addAccount()">
-		<input type="text" 
-		       placeholder="Account Name"
-		       class="form-control"
-		       style="width:15em"
-		       ng-model="newAcct.name">
-	      <select ng-model="newAcct.curr" class="form-control">
-		<option value="GBP">GBP</option>
-		<option value="USD">USD</option>
-	      </select>
-	      <button type="submit" class="btn btn-default">Add</button>
-	    </form>
-	  </div>
+	  <!-- <div> -->
+	  <!--   <form class="form-inline" ng-submit="addAccount()"> -->
+	  <!-- 	<input type="text"  -->
+	  <!-- 	       placeholder="Account Name" -->
+	  <!-- 	       class="form-control" -->
+	  <!-- 	       style="width:15em" -->
+	  <!-- 	       ng-model="newAcct.name"> -->
+	  <!--     <select ng-model="newAcct.curr" class="form-control"> -->
+	  <!-- 	<option value="GBP">GBP</option> -->
+	  <!-- 	<option value="USD">USD</option> -->
+	  <!--     </select> -->
+	  <!--     <button ng-submit="addAccount()" class="btn btn-default">Add</button> -->
+	  <!--   </form> -->
+	  <!-- </div> -->
 	</div>
 	
 	<div class="col-sm-6">
@@ -88,6 +101,37 @@
 	    <input type="text"
 	     ng-model="trans_filter.account">
 	  </th>
+	</tr>
+	<tr>
+	  <td>
+	    <input type="text"
+	  	   placeholder="MM/DD/YY"
+	  	   ng-model="newTrans.date"> 
+	  </td>
+	  <td>
+	    <input type="text"
+	  	   placeholder="XX.XX"
+	  	   ng-model="newTrans.amount"> 
+	  </td>
+	  <td>
+	    <input type="text"
+	  	   placeholder="Category"
+	  	   ng-model="newTrans.category"> 
+	  </td>
+	  <td>
+	    <input type="text"
+	  	   placeholder="New Transaction"
+	  	   style="width:15em"
+	  	   ng-model="newTrans.note"> 
+	  </td>
+	  <td>
+	    <select ng-model="newTrans.account" 
+		    ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
+	    </select>
+	  </td>
+	  <td>
+	    <button ng-click="addTransaction()" class="btn btn-default">Add</button>
+	  </td>
 	</tr>
 	<tr ng-repeat="transaction in transactions | orderBy:getDate:true | filter:catFilter">
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>

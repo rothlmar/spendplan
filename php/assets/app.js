@@ -3,7 +3,6 @@
 var app = angular.module('spendPlan',['dropstore-ng']);
 
 app.controller('SpendPlanCtrl', 
-	       // ['$scope', 'dropstoreClient',
 		function SpendPlanCtrl($scope, dropstoreClient) {
 		    var _datastore = null;
 		    var _accountTable = null;
@@ -11,6 +10,7 @@ app.controller('SpendPlanCtrl',
 		    $scope.newAcct = {name:'', curr:'USD'};
 		    $scope.accounts = [];
 		    $scope.transactions = [];
+		    $scope.categories = [];
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
 					   amount_min:'',
@@ -19,6 +19,13 @@ app.controller('SpendPlanCtrl',
 					   note:'',
 					   account:''
 					  };
+		    $scope.newTrans = {
+			date: '',
+			amount: '',
+			category: '',
+			note: '',
+			account: ''
+		    };
 		    dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 			.authenticate({interactive: true})
 			.then(function(datastoreManager) {
@@ -27,7 +34,12 @@ app.controller('SpendPlanCtrl',
 			})
 			.then(function(datastore) {
 			    _datastore = datastore;
+
 			    _accountTable = _datastore.getTable('accounts');
+			    $scope.acctTable = _accountTable;
+			    $scope.accounts = _accountTable.query();
+
+			    $scope.newTrans.account = $scope.accounts[0];
 
 			    _datastore.SubscribeRecordsChanged(function(records) {
 				for (var ndx in records ){
@@ -35,11 +47,21 @@ app.controller('SpendPlanCtrl',
 				}
 			    }, 'accounts');
 
-			    $scope.acctTable = _accountTable;
-			    $scope.accounts = _accountTable.query();
 
 			    _transactionTable = _datastore.getTable('transactions');
 			    $scope.transactions = _transactionTable.query();
+
+			    _datastore.SubscribeRecordsChanged(function(records) {
+				for (var ndx in records) {
+				    $scope.transactions.push(records[ndx]);
+				    var cat_name = records[ndx].get('Category');
+				    if (!(cat_name in $scope.categories)) {
+					$scope.categories[cat_name] = 0;
+				    };
+				    $scope.categories[cat_name] += records[ndx].get('Amount');
+				}
+			    }, 'transactions');
+
 			    
 			    var categories = {};
 			    for (var ndx in $scope.transactions) {
@@ -114,7 +136,7 @@ app.controller('SpendPlanCtrl',
 			    var date = new Date(date_arr[2],
 						    date_arr[0]-1,
 						    date_arr[1]);
-			    console.log(date);
+			    // console.log(date);
 			    date_max = (transaction.get('Date') <= date);
 			};
 			
@@ -122,7 +144,7 @@ app.controller('SpendPlanCtrl',
 			    note_pat.test(transaction.get('Note')) &
 			    min_test & max_test &
 			    date_min & date_max;
-		};
+		    };
 		    
 		    $scope.addAccount = function() {
 			console.log(JSON.stringify($scope.newAcct));
@@ -131,5 +153,26 @@ app.controller('SpendPlanCtrl',
 			    currency: $scope.newAcct.curr
 			});
 		    };
+
+		    $scope.addTransaction = function() {
+			// console.log(JSON.stringify($scope.newTrans));
+			var date_arr = $scope.newTrans.date.split('/');
+			if (date_arr[2].length == 2) {
+			    date_arr[2] = '20' + date_arr[2];
+			    console.log(JSON.stringify(date_arr));
+			};
+			var date = new Date(date_arr[2],
+					    date_arr[0]-1,
+					    date_arr[1]);
+			console.log(JSON.stringify(date))
+			_transactionTable.insert({
+			    Date: date,
+			    Amount: Number($scope.newTrans.amount),
+			    Category: $scope.newTrans.category,
+			    Note: $scope.newTrans.note,
+			    Account: $scope.newTrans.account.getId()
+			});
+		    };
+
 
 		});
