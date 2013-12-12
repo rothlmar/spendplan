@@ -9,8 +9,8 @@ app.controller('SpendPlanCtrl',
 		    var _transactionTable = null;
 		    $scope.newAcct = {name:'', curr:'USD'};
 		    $scope.accounts = [];
-		    $scope.transactions = [];
-		    $scope.categories = [];
+		    $scope.transactions = {};
+		    $scope.categories = {};
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
 					   amount_min:'',
@@ -49,16 +49,26 @@ app.controller('SpendPlanCtrl',
 
 
 			    _transactionTable = _datastore.getTable('transactions');
-			    $scope.transactions = _transactionTable.query();
+			    var trans_temp = _transactionTable.query();
+			    for (var ndx in trans_temp) {
+				var record = trans_temp[ndx];
+				$scope.transactions[record.getId()] = record;
+			    };
+
 
 			    _datastore.SubscribeRecordsChanged(function(records) {
 				for (var ndx in records) {
-				    $scope.transactions.push(records[ndx]);
-				    var cat_name = records[ndx].get('Category');
-				    if (!(cat_name in $scope.categories)) {
-					$scope.categories[cat_name] = 0;
+				    var record = records[ndx];
+				    
+				    if (record.isDeleted()) {
+					delete $scope.transactions[record.getId()];
+				    } else {
+					$scope.transactions[record.getId()] = record;
+					var cat_name = record.get('Category');
+					if (!(cat_name in $scope.categories)) {
+					    $scope.categories[cat_name] = true;
+					};
 				    };
-				    $scope.categories[cat_name] += records[ndx].get('Amount');
 				}
 			    }, 'transactions');
 
@@ -88,17 +98,23 @@ app.controller('SpendPlanCtrl',
 		    };
 
 		    $scope.getBalance = function(account) {
-			// console.log(account.getId());
 			var acct_trans = _transactionTable.query({"Account": account.getId()});
-			// console.log(acct_trans.length);
-			var total = 0.0
+			var total = 0.0;
 			for ( var ndx in acct_trans) {
 			    total += acct_trans[ndx].get('Amount');
-			    // total += 1;
 			}
 			return total;
 		    };
 		    
+		    $scope.getCatBalance = function(category) {
+			var cat_trans = _transactionTable.query({"Category": category});
+			var total = 0.0;
+			for ( var ndx in cat_trans) {
+			    total += cat_trans[ndx].get('Amount');
+			}
+			return total;
+		    }
+
 		    $scope.currSymbol = function(account) {
 			if (account.get('currency') == 'USD') {
 			    return '$';
@@ -112,6 +128,7 @@ app.controller('SpendPlanCtrl',
 		    $scope.catFilter = function(transaction) {
 			var cat_pat = new RegExp($scope.trans_filter.category,'gi');
 			var note_pat = new RegExp($scope.trans_filter.note,'gi');
+			var acct_pat = new RegExp($scope.trans_filter.account,'gi');
 			var min_test = true;
 			var max_test = true;
 			if ($scope.trans_filter.amount_min != '') {
@@ -128,7 +145,7 @@ app.controller('SpendPlanCtrl',
 			    var date = new Date(date_arr[2],
 						    date_arr[0]-1,
 						    date_arr[1]);
-			    console.log(date);
+			    // console.log(date);
 			    date_min = (transaction.get('Date') >= date);
 			};
 			if ($scope.trans_filter.date_max != '') {
@@ -139,32 +156,41 @@ app.controller('SpendPlanCtrl',
 			    // console.log(date);
 			    date_max = (transaction.get('Date') <= date);
 			};
+			var account_match = true;
 			
 			return cat_pat.test(transaction.get('Category')) & 
 			    note_pat.test(transaction.get('Note')) &
+			    acct_pat.test($scope.acctTable.get(transaction.get('Account')).get('acctname')) &
 			    min_test & max_test &
 			    date_min & date_max;
 		    };
 		    
 		    $scope.addAccount = function() {
-			console.log(JSON.stringify($scope.newAcct));
 			_accountTable.insert({
 			    acctname: $scope.newAcct.name,
 			    currency: $scope.newAcct.curr
 			});
 		    };
 
+		    $scope.toArray = function(any_obj) {
+			var any_arr = new Array;
+			for (var o in any_obj) {
+			    any_arr.push(any_obj[o]);
+			};
+			return any_arr;
+		    };
+		    
 		    $scope.addTransaction = function() {
 			// console.log(JSON.stringify($scope.newTrans));
 			var date_arr = $scope.newTrans.date.split('/');
 			if (date_arr[2].length == 2) {
 			    date_arr[2] = '20' + date_arr[2];
-			    console.log(JSON.stringify(date_arr));
+			    // console.log(JSON.stringify(date_arr));
 			};
 			var date = new Date(date_arr[2],
 					    date_arr[0]-1,
 					    date_arr[1]);
-			console.log(JSON.stringify(date))
+			// console.log(JSON.stringify(date))
 			_transactionTable.insert({
 			    Date: date,
 			    Amount: Number($scope.newTrans.amount),
@@ -172,6 +198,10 @@ app.controller('SpendPlanCtrl',
 			    Note: $scope.newTrans.note,
 			    Account: $scope.newTrans.account.getId()
 			});
+		    };
+
+		    $scope.deleteTransaction = function(transaction) {
+			transaction.deleteRecord();
 		    };
 
 

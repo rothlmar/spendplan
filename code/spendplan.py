@@ -5,16 +5,15 @@ from csv import DictReader
 
 app_key = 'i86ppgkz7etf1vk'
 access_tokens = yaml.load(open('/home/rothlmar/.dropbox_access_token').read())
-access_token = access_tokens[app_key]
+access_token = access_tokens.get(app_key)
 
-
-# flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
-
-# authorize_url = flow.start()
-# print(authorize_url)
-# code = raw_input("Enter auth code: ").strip()
-# access_token, user_id = flow.finish(code)
-# print("access token: ", access_token)
+if access_token == None:
+    flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
+    authorize_url = flow.start()
+    print(authorize_url)
+    code = raw_input("Enter auth code: ").strip()
+    access_token, user_id = flow.finish(code)
+    print("access token: ", access_token)
 
 client = dropbox.client.DropboxClient(access_token)
 print('linked account: {}'.format(client.account_info()['display_name']))
@@ -30,6 +29,3 @@ category_table = datastore.get_table('categories')
 
 
 
-# f = open('boxdrop.py')
-# response = client.put_file('/boxdrop.py',f)
-# print("uploaded:",response)
