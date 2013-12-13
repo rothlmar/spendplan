@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"	>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="assets/css/spendplan.css">
     <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     
@@ -70,7 +71,7 @@
       </div> <!-- row -->
 
       <h3>Transactions:</h3>
-      <table class="table table-responsive table-condensed">
+      <table class="table table-responsive table-condensed" id="trans-table">
 	<tr>
 	  <th>
 	    Date
@@ -146,7 +147,14 @@
 	<tr ng-repeat="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
 	  <td class="{{ getColor(transaction) }}">{{ transaction.get('Amount') | currency }}</td>
-	  <td>{{ transaction.get('Category') }}</td>
+	  <td ng-class="{ editing: transaction == edit_trans }">
+	    <span class="view" ng-dblclick="editCat(transaction)">
+	      {{ transaction.get('Category') | empty }}
+	    </span>
+	    <span class="edit">
+	      <input type="text" ng-model="editedCategory.cat" ng-blur="editCategory(transaction)">
+	    </span>
+	  </td>
 	  <td>{{ transaction.get('Note') }}</td>
 	  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
 	    ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>

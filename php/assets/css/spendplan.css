@@ -1,0 +1,11 @@
+#trans-table td.editing .view {
+    display: none;
+}
+
+#trans-table td .edit {
+    display: none;
+}
+
+#trans-table td.editing .edit {
+    display: table-cell;
+}

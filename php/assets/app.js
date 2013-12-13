@@ -2,6 +2,16 @@
 
 var app = angular.module('spendPlan',['dropstore-ng']);
 
+app.filter('empty', function () {
+    return function(input) {
+	if (input != '') {
+	    return input;
+	} else {
+	    return "Uncategorized";
+	}
+    };
+});
+
 app.controller('SpendPlanCtrl', 
 		function SpendPlanCtrl($scope, dropstoreClient) {
 		    var _datastore = null;
@@ -11,6 +21,7 @@ app.controller('SpendPlanCtrl',
 		    $scope.accounts = [];
 		    $scope.transactions = {};
 		    $scope.categories = {};
+		    $scope.edit_trans = null;
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
 					   amount_min:'',
@@ -25,6 +36,11 @@ app.controller('SpendPlanCtrl',
 			category: '',
 			note: '',
 			account: ''
+		    };
+		    var _cat = "";
+		    $scope.editedCategory = {
+			get cat() { return _cat; },
+			set cat(val) { _cat = val }
 		    };
 		    dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 			.authenticate({interactive: true})
@@ -204,5 +220,19 @@ app.controller('SpendPlanCtrl',
 			transaction.deleteRecord();
 		    };
 
+		    $scope.editCat = function(transaction) {
+			_cat = transaction.get('Category');
+			$scope.edit_trans = transaction;
+		    };
+
+		    $scope.editCategory = function(transaction) {
+			if (_cat != '') {
+			    transaction.set('Category', _cat);
+			}
+			$scope.edit_trans = null;
+		    };
 
 		});
+
+
+
