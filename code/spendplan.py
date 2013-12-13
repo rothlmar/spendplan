@@ -1,6 +1,8 @@
-import yaml 
-import dropbox.datastore
-from csv import DictReader
+import calendar
+import yaml
+import dropbox, dropbox.datastore
+from dateutil import parser
+from csv import reader
 
 
 app_key = 'i86ppgkz7etf1vk'
@@ -8,6 +10,7 @@ access_tokens = yaml.load(open('/home/rothlmar/.dropbox_access_token').read())
 access_token = access_tokens.get(app_key)
 
 if access_token == None:
+    app_secret = raw_input('Enter the app secret: ')
     flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
     authorize_url = flow.start()
     print(authorize_url)
@@ -22,10 +25,44 @@ datastore = manager.open_default_datastore()
 
 account_table = datastore.get_table('accounts')
 transaction_table = datastore.get_table('transactions')
-exchange_table = datastore.get_table('exchange_rates')
-group_table = datastore.get_table('groups')
-category_table = datastore.get_table('categories')
+# exchange_table = datastore.get_table('exchange_rates')
+
+all_accounts = list(account_table.query())
+for idx, acct in enumerate(all_accounts):
+    fields = acct.get_fields()
+    print("{0}: {acctname} ({currency})".format(idx,**fields))
+acct_num = int(raw_input("Which account? "))
+acct_id = all_accounts[acct_num].get_id()
 
 
+#TFCU field_dict: {'Category': 3, 'Date': 1, 'Note': 2, 'credit': 5, 'debit': 4}, start_line: 4, False
 
+
+def create_records(filename, field_dict, start, end, use_minus=True):
+    trans_prototype = {'Date':'',
+                       'Category':'',
+                       'Amount':0,
+                       'Account':'',
+                       'Note':''}
+    with open(filename,'r') as f:
+        recs = [l for l in reader(f)]
+
+    for rec in recs[start:end]:
+        print(rec)
+        r_dict = dict(trans_prototype)
+        r_dict['Date'] = parser.parse(rec[field_dict['Date']])
+        r_dict['Date'] = calendar.timegm(r_dict['Date'].timetuple())
+        r_dict['Date'] = dropbox.datastore.Date(r_dict['Date'])
+        r_dict['Note'] = rec[field_dict['Note']]
+        r_dict['Category'] = rec[field_dict['Category']]
+        r_dict['Account'] = acct_id
+        if rec[field_dict['credit']].strip():
+            r_dict['Amount'] = float(rec[field_dict['credit']].strip().replace(',',''))
+        else:
+            r_dict['Amount'] = float(rec[field_dict['debit']].strip().replace(',',''))
+            if use_minus:
+                r_dict['Amount'] *= -1
+                                     
+        transaction_table.insert(**r_dict)
+    datastore.commit()
 
