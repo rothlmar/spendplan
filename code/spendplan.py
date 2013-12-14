@@ -1,4 +1,4 @@
-import calendar
+import calendar, datetime
 import yaml
 import dropbox, dropbox.datastore
 from dateutil import parser
@@ -27,18 +27,21 @@ account_table = datastore.get_table('accounts')
 transaction_table = datastore.get_table('transactions')
 # exchange_table = datastore.get_table('exchange_rates')
 
-all_accounts = list(account_table.query())
-for idx, acct in enumerate(all_accounts):
-    fields = acct.get_fields()
-    print("{0}: {acctname} ({currency})".format(idx,**fields))
-acct_num = int(raw_input("Which account? "))
-acct_id = all_accounts[acct_num].get_id()
+def choose_account():
+    all_accounts = list(account_table.query())
+    for idx, acct in enumerate(all_accounts):
+        fields = acct.get_fields()
+        print("{0}: {acctname} ({currency})".format(idx,**fields))
+    acct_num = int(raw_input("Which account? "))
+    return all_accounts[acct_num].get_id()
 
 
 #TFCU field_dict: {'Category': 3, 'Date': 1, 'Note': 2, 'credit': 5, 'debit': 4}, start_line: 4, False
+#Bank of America: {'Date':0, 'Note':1, 'credit':2, 'debit':2, 'Category':0}, start_line: 8, False
+#Barclays: {'Category': 4, 'Date': 1, 'Note': 5, 'credit': 3, 'debit': 3}, start_line: 1, False, '%d/%m/%Y'
 
-
-def create_records(filename, field_dict, start, end, use_minus=True):
+def create_records(filename, field_dict, start, end, use_minus=True,date_parse=None):
+    acct_id = choose_account()
     trans_prototype = {'Date':'',
                        'Category':'',
                        'Amount':0,
@@ -48,9 +51,12 @@ def create_records(filename, field_dict, start, end, use_minus=True):
         recs = [l for l in reader(f)]
 
     for rec in recs[start:end]:
-        print(rec)
+        # print(rec)
         r_dict = dict(trans_prototype)
-        r_dict['Date'] = parser.parse(rec[field_dict['Date']])
+        if date_parse:
+            r_dict['Date'] = datetime.datetime.strptime(rec[field_dict['Date']], date_parse)
+        else:
+            r_dict['Date'] = parser.parse(rec[field_dict['Date']])
         r_dict['Date'] = calendar.timegm(r_dict['Date'].timetuple())
         r_dict['Date'] = dropbox.datastore.Date(r_dict['Date'])
         r_dict['Note'] = rec[field_dict['Note']]
