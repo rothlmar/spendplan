@@ -146,7 +146,9 @@
 	</tr>
 	<tr ng-repeat="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
-	  <td class="{{ getColor(transaction) }}">{{ transaction.get('Amount') | currency }}</td>
+	  <td class="{{ getColor(transaction) }}">
+	    {{ transaction.get('Amount') | currency:currSymbol(transaction.get('Account')) }}
+	  </td>
 	  <td ng-class="{ editing: transaction == edit_trans }">
 	    <span class="view" ng-dblclick="editCat(transaction)">
 	      {{ transaction.get('Category') | empty }}
