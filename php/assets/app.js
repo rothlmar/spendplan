@@ -17,6 +17,7 @@ app.controller('SpendPlanCtrl',
 		    var _datastore = null;
 		    var _accountTable = null;
 		    var _transactionTable = null;
+		    var _exchangeTable = null;
 		    $scope.newAcct = {name:'', curr:'USD'};
 		    $scope.accounts = [];
 		    $scope.transactions = {};
@@ -37,6 +38,7 @@ app.controller('SpendPlanCtrl',
 			note: '',
 			account: ''
 		    };
+		    $scope.exchangeRates = {};
 		    var _cat = "";
 		    $scope.editedCategory = {
 			get cat() { return _cat; },
@@ -65,6 +67,13 @@ app.controller('SpendPlanCtrl',
 
 
 			    _transactionTable = _datastore.getTable('transactions');
+			    _exchangeTable = _datastore.getTable('exchange_rates')
+			    var temp_rates = _exchangeTable.query();
+			    for (var ndx in temp_rates) {
+				var rate_date = temp_rates[ndx].get('date');
+				rate_date.setHours(0,0,0,0);
+				$scope.exchangeRates[rate_date] = temp_rates[ndx].get('rate');
+			    };
 			    var trans_temp = _transactionTable.query();
 			    for (var ndx in trans_temp) {
 				var record = trans_temp[ndx];

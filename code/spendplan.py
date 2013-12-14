@@ -25,7 +25,6 @@ datastore = manager.open_default_datastore()
 
 account_table = datastore.get_table('accounts')
 transaction_table = datastore.get_table('transactions')
-# exchange_table = datastore.get_table('exchange_rates')
 
 def choose_account():
     all_accounts = list(account_table.query())
@@ -72,3 +71,21 @@ def create_records(filename, field_dict, start, end, use_minus=True,date_parse=N
         transaction_table.insert(**r_dict)
     datastore.commit()
 
+def update_exchange_rates():
+    import json
+    import requests
+    exchange_table = datastore.get_table('exchange_rates')
+    max_date = max([r.get('date').to_datetime_utc() for r in exchange_table.query()])
+    start_date = max_date + datetime.timedelta(1)
+    req_fmt_str = "http://openexchangerates.org/api/historical/{}.json?app_id=36646cf83ce04bc1af40246f9015db65"
+    req_strs = [req_fmt_str.format((start_date + datetime.timedelta(i)).strftime('%Y-%m-%d')) for i in range((datetime.datetime.today() - start_date).days)]
+    responses = [requests.get(rs) for rs in req_strs]
+    json_content = [json.loads(r.content) for r in responses]
+    good_content = [{
+            'date': dropbox.datastore.Date.from_datetime_utc(datetime.datetime.fromtimestamp(j['timestamp'])-datetime.timedelta(hours=23)),
+            'rate':j['rates']['GBP']} for j in json_content]
+    for xr in good_content:
+        exchange_table.insert(**xr)
+    datastore.commit()
+
+    

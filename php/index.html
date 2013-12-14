@@ -150,6 +150,9 @@
 	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
 	  <td class="{{ getColor(transaction) }}">
 	    {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
+	    <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
+	      // {{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
+	    </span>
 	  </td>
 	  <td ng-class="{ editing: transaction == edit_trans }">
 	    <span class="view" ng-dblclick="editCat(transaction)">
