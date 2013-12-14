@@ -135,7 +135,13 @@ app.controller('SpendPlanCtrl',
 			var cat_trans = _transactionTable.query({"Category": category});
 			var total = 0.0;
 			for ( var ndx in cat_trans) {
-			    total += cat_trans[ndx].get('Amount');
+			    var trans = cat_trans[ndx];
+			    var amount = trans.get('Amount');
+			    if ($scope.acctTable.get(trans.get('Account')).get('currency') == 'GBP') {
+				amount /= $scope.exchangeRates[trans.get('Date')];
+			    };
+			    total += amount;
+
 			}
 			return total;
 		    }
