@@ -22,7 +22,19 @@ app.controller('SpendPlanCtrl',
 		    $scope.accounts = [];
 		    $scope.transactions = {};
 		    $scope.categories = {};
-		    $scope.edit_trans = null;
+		    $scope.edit_category = {
+			tran: null,
+			cat: ""
+		    };
+		    $scope.edit_note = {
+			tran: null,
+			note: ""
+		    };
+		    var _cat = "";
+		    $scope.editedCategory = {
+			get cat() { return _cat; },
+			set cat(val) { _cat = val }
+		    };
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
 					   amount_min:'',
@@ -39,11 +51,6 @@ app.controller('SpendPlanCtrl',
 			account: ''
 		    };
 		    $scope.exchangeRates = {};
-		    var _cat = "";
-		    $scope.editedCategory = {
-			get cat() { return _cat; },
-			set cat(val) { _cat = val }
-		    };
 		    dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 			.authenticate({interactive: true})
 			.then(function(datastoreManager) {
@@ -235,18 +242,31 @@ app.controller('SpendPlanCtrl',
 			transaction.deleteRecord();
 		    };
 
-		    $scope.editCat = function(transaction) {
-			_cat = transaction.get('Category');
-			$scope.edit_trans = transaction;
+		    $scope.startEditCat = function(transaction) {
+			$scope.edit_category.cat = transaction.get('Category');
+			$scope.edit_category.tran = transaction;
 		    };
 
 		    $scope.editCategory = function(transaction) {
-			if (_cat != '') {
-			    transaction.set('Category', _cat);
-			}
-			$scope.edit_trans = null;
+			if ($scope.edit_category.cat != '') {
+			    transaction.set('Category', $scope.edit_category.cat);
+			};
+			$scope.edit_category.tran = null;
+			$scope.edit_category.cat = "";
 		    };
 
+		    $scope.startEditNote = function(transaction) {
+			$scope.edit_note.note = transaction.get('Note');
+			$scope.edit_note.tran = transaction;
+		    };
+
+		    $scope.editNote = function(transaction) {
+			if ($scope.edit_note.note != '') {
+			    transaction.set('Note', $scope.edit_note.note);
+			};
+			$scope.edit_note.tran = null;
+			$scope.edit_note.note = "";
+		    };
 		});
 
 

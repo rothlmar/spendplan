@@ -39,24 +39,12 @@
 	  	  <option value="GBP">GBP</option>
 	  	  <option value="USD">USD</option>
 		</select>
-	      <button ng-click="addAccount()" class="btn btn-default">Add</button>
+	      </td>
+	      <td>
+		<button ng-click="addAccount()" class="btn btn-default">Add</button>
 	      </td>
 	    </tr>
 	  </table>
-	  <!-- <div> -->
-	  <!--   <form class="form-inline" ng-submit="addAccount()"> -->
-	  <!-- 	<input type="text"  -->
-	  <!-- 	       placeholder="Account Name" -->
-	  <!-- 	       class="form-control" -->
-	  <!-- 	       style="width:15em" -->
-	  <!-- 	       ng-model="newAcct.name"> -->
-	  <!--     <select ng-model="newAcct.curr" class="form-control"> -->
-	  <!-- 	<option value="GBP">GBP</option> -->
-	  <!-- 	<option value="USD">USD</option> -->
-	  <!--     </select> -->
-	  <!--     <button ng-submit="addAccount()" class="btn btn-default">Add</button> -->
-	  <!--   </form> -->
-	  <!-- </div> -->
 	</div>
 	
 	<div class="col-sm-4" >
@@ -154,15 +142,22 @@
 	      // {{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
 	    </span>
 	  </td>
-	  <td ng-class="{ editing: transaction == edit_trans }">
-	    <span class="view" ng-dblclick="editCat(transaction)">
+	  <td ng-class="{ editing: transaction == edit_category.tran }">
+	    <span class="view" ng-dblclick="startEditCat(transaction)">
 	      {{ transaction.get('Category') | empty }}
 	    </span>
 	    <span class="edit">
-	      <input type="text" ng-model="editedCategory.cat" ng-blur="editCategory(transaction)">
+	      <input type="text" ng-model="edit_category.cat" ng-blur="editCategory(transaction)">
 	    </span>
 	  </td>
-	  <td>{{ transaction.get('Note') }}</td>
+	  <td ng-class="{ editing: transaction == edit_note.tran }">
+	    <span class="view" ng-dblclick="startEditNote(transaction)">
+	      {{ transaction.get('Note') | empty }}
+	    </span>
+	    <span class="edit">
+	      <input type="text" ng-model="edit_note.note" ng-blur="editNote(transaction)">
+	    </span>
+	  </td>
 	  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
 	    ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
 	  <td>
