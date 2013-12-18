@@ -62,110 +62,141 @@
 
       <h3>Transactions:</h3>
       <table class="table table-responsive table-condensed" id="trans-table">
-	<tr>
-	  <th>
-	    Date
-	    <input type="text"
-		   style="width:4em"
-		   ng-model="trans_filter.date_min"
-		   placeholder="MM/DD/YYYY">
-	    -
-	    <input type="text"
-		   style="width:4em"
-		   ng-model="trans_filter.date_max"
-		   placeholder="MM/DD/YYYY">
-	  </th>
-	  <th>Amount
-	    <input type="text"
-		   style="width:4em"
-		   ng-model="trans_filter.amount_min"
-		   placeholder="min">
-	    -
-	    <input type="text"
-		   style="width:4em"
-		   ng-model="trans_filter.amount_max"
-		   placeholder="max">
-	  </th>
-	  <th>Category
-	    <input type="text"
-		   style="width:7em"
-		   ng-model="trans_filter.category">
-	  </th>
-	  <th>Note
-	    <input type="text"
-	     ng-model="trans_filter.note">
-	  </th>
-	  <th>Account
-	    <input type="text"
-		   ng-model="trans_filter.account" >
-	  </th>
-	  <th>
-	    Action
-	  </th>
-	</tr>
-	<tr>
-	  <td>
-	    <input type="text"
-	  	   placeholder="MM/DD/YY"
-	  	   ng-model="newTrans.date"> 
-	  </td>
-	  <td>
-	    <input type="text"
-	  	   placeholder="XX.XX"
-	  	   ng-model="newTrans.amount"> 
-	  </td>
-	  <td>
-	    <input type="text"
-	  	   placeholder="Category"
-	  	   ng-model="newTrans.category"> 
-	  </td>
-	  <td>
-	    <input type="text"
-	  	   placeholder="New Transaction"
-	  	   style="width:15em"
-	  	   ng-model="newTrans.note"> 
-	  </td>
-	  <td>
-	    <select ng-model="newTrans.account" 
-		    ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
-	    </select>
-	  </td>
-	  <td>
-	    <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
-	  </td>
-	</tr>
-	<tr ng-repeat="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
-	  <td>{{ transaction.get('Date') | date:'shortDate' }}</td>
-	  <td class="{{ getColor(transaction) }}">
-	    {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
-	    <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
-	      // {{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
-	    </span>
-	  </td>
-	  <td ng-class="{ editing: transaction == edit_category.tran }">
-	    <span class="view" ng-dblclick="startEditCat(transaction)">
-	      {{ transaction.get('Category') | empty }}
-	    </span>
-	    <span class="edit">
-	      <input type="text" ng-model="edit_category.cat" ng-blur="editCategory(transaction)">
-	    </span>
-	  </td>
-	  <td ng-class="{ editing: transaction == edit_note.tran }">
-	    <span class="view" ng-dblclick="startEditNote(transaction)">
-	      {{ transaction.get('Note') | empty }}
-	    </span>
-	    <span class="edit">
-	      <input type="text" ng-model="edit_note.note" ng-blur="editNote(transaction)">
-	    </span>
-	  </td>
-	  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
-	    ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
-	  <td>
-	    <span class="glyphicon glyphicon-remove"
-		  ng-click="deleteTransaction(transaction)">
-	    </span>
-	  </td>
-	</tr>
+	<thead>
+	  <tr>
+	    <th>
+	      Date
+	      <br>
+	      <input type="text"
+		     style="width:4em"
+		     ng-model="trans_filter.date_min"
+		     placeholder="MM/DD/YYYY">
+	      <br>
+	      <input type="text"
+		     style="width:4em"
+		     ng-model="trans_filter.date_max"
+		     placeholder="MM/DD/YYYY">
+	    </th>
+	    <th>
+	      Amount
+	      <br>
+	      <input type="text"
+		     style="width:4em"
+		     ng-model="trans_filter.amount_min"
+		     placeholder="min">
+	      <br>
+	      <input type="text"
+		     style="width:4em"
+		     ng-model="trans_filter.amount_max"
+		     placeholder="max">
+	    </th>
+	    <th>
+	      Category
+	      <input type="text"
+		     style="width:7em"
+		     ng-model="trans_filter.category">
+	    </th>
+	    <th>
+	      Note
+	      <br>
+	      <input type="text"
+		     ng-model="trans_filter.note">
+	    </th>
+	    <th>
+	      Account
+	      <br>
+	      <input type="text"
+		     ng-model="trans_filter.account" >
+	    </th>
+	    <th>
+	      Action
+	    </th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    <td>
+	      <input type="text"
+		     style="width:4em"
+	  	     placeholder="MM/DD/YY"
+	  	     ng-model="newTrans.date">
+	    </td>
+	    <td>
+	      <input type="text"
+		     style="width:4em"
+	  	     placeholder="XX.XX"
+	  	     ng-model="newTrans.amount">
+	    </td>
+	    <td>
+	      <input type="text"
+		     style="width:7em"
+	  	     placeholder="Category"
+	  	     ng-model="newTrans.category">
+	    </td>
+	    <td>
+	      <input type="text"
+	  	     placeholder="New Transaction"
+	  	     style="width:15em"
+	  	     ng-model="newTrans.note">
+	    </td>
+	    <td>
+	      <select ng-model="newTrans.account"
+	  	      ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
+	      </select>
+	    </td>
+	    <td>
+	      <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
+	    </td>
+	  </tr>
+	  <tr ng-repeat-start="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
+	    <td rowspan="2">{{ transaction.get('Date') | date:'shortDate' }}</td>
+	    <td rowspan="2" class="{{ getColor(transaction) }}">
+	      {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
+	      <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
+		<br>{{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
+	      </span>
+	    </td>
+	    <td ng-class="{ editing: transaction == edit_category.tran }">
+	      <span class="view" ng-dblclick="startEditCat(transaction)">
+		{{ transaction.get('Category') | empty }}
+	      </span>
+	      <span class="edit">
+		<input type="text" ng-model="edit_category.cat" ng-blur="editCategory(transaction)">
+	      </span>
+	    </td>
+	    <td ng-class="{ editing: transaction = edit_tags.tran }"
+		ng-dblclick="startEditTags(transaction)">
+	      TAGS: 
+	      <span ng-repeat="tag in getTags(transaction)"
+	      	    class="view">
+	      	<span class="label label-default">{{ tag }}</span>
+	      </span>
+	      <span class="edit">
+	      	<input type="text"
+	      	       ng-model="edit_tags.tags"
+	      	       ng-blur="editTags(transaction)">
+	      </span>
+	    </td>
+	    <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
+	      ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
+	    <td>
+	      <span class="glyphicon glyphicon-remove"
+		    ng-click="deleteTransaction(transaction)">
+	      </span>
+	    </td>
+	  </tr>
+	  <tr ng-repeat-end>
+	    <td colspan="4"
+		ng-class="{ editing: transaction == edit_note.tran }">
+	      <span class="view" ng-dblclick="startEditNote(transaction)">
+		{{ transaction.get('Note') | empty }}
+	      </span>
+	      <span class="edit">
+		<input type="text" ng-model="edit_note.note" ng-blur="editNote(transaction)">
+	      </span>
+	    </td>
+	  </tr>
+	</tbody>
       </table>
     </div>
   </body>

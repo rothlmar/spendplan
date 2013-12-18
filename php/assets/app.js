@@ -30,10 +30,9 @@ app.controller('SpendPlanCtrl',
 			tran: null,
 			note: ""
 		    };
-		    var _cat = "";
-		    $scope.editedCategory = {
-			get cat() { return _cat; },
-			set cat(val) { _cat = val }
+		    $scope.edit_tags = {
+			tran: null,
+			tags: ''
 		    };
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
@@ -267,6 +266,34 @@ app.controller('SpendPlanCtrl',
 			$scope.edit_note.tran = null;
 			$scope.edit_note.note = "";
 		    };
+		    
+		    $scope.startEditTags = function(transaction) {
+		    	$scope.edit_tags.tags = $scope.getTags(transaction);
+		    	$scope.edit_tags.tran = transaction;
+		    };
+
+		    $scope.editTags = function(transaction) {
+		    	console.log($scope.edit_tags.tags);
+			if ($scope.edit_tags.tags != '') {
+			    transaction.set('Note', $scope.edit_note.note);
+			};
+			$scope.edit_tags.tran = null;
+			$scope.edit_tags.tags = "";
+		    };
+
+
+		    $scope.getTags = function(transaction) {
+			var tag_list = transaction.getOrCreateList('Tags');
+			var ret_list = [];
+			for (var ndx=0; ndx<tag_list.length(); ndx++) {
+			    ret_list.push(tag_list.get(ndx));
+			};
+			if (ret_list.length == 0) {
+			    ret_list.push('No tags');
+			};
+			return ret_list;
+		    };
+
 		});
 
 

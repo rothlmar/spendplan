@@ -84,6 +84,7 @@ def update_exchange_rates():
     good_content = [{
             'date': dropbox.datastore.Date.from_datetime_utc(datetime.datetime.fromtimestamp(j['timestamp'])-datetime.timedelta(hours=23)),
             'rate':j['rates']['GBP']} for j in json_content]
+    print(good_content)
     for xr in good_content:
         exchange_table.insert(**xr)
     datastore.commit()
