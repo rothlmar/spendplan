@@ -164,9 +164,8 @@
 		<input type="text" ng-model="edit_category.cat" ng-blur="editCategory(transaction)">
 	      </span>
 	    </td>
-	    <td ng-class="{ editing: transaction = edit_tags.tran }"
+	    <td ng-class="{ editing: transaction == edit_tags.tran }"
 		ng-dblclick="startEditTags(transaction)">
-	      TAGS: 
 	      <span ng-repeat="tag in getTags(transaction)"
 	      	    class="view">
 	      	<span class="label label-default">{{ tag }}</span>

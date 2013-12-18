@@ -273,9 +273,16 @@ app.controller('SpendPlanCtrl',
 		    };
 
 		    $scope.editTags = function(transaction) {
-		    	console.log($scope.edit_tags.tags);
+			var trans_tags = transaction.getOrCreateList('Tags');
+			var tag_arr = trans_tags.toArray();
 			if ($scope.edit_tags.tags != '') {
-			    transaction.set('Note', $scope.edit_note.note);
+			    var all_tags = $scope.edit_tags.tags.split(',');
+			    for (var ndx in all_tags) {
+				var cur_tag = all_tags[ndx].trim();
+				if (tag_arr.indexOf(cur_tag) == -1) {
+				    trans_tags.push(cur_tag);
+				};
+			    };
 			};
 			$scope.edit_tags.tran = null;
 			$scope.edit_tags.tags = "";
@@ -284,12 +291,9 @@ app.controller('SpendPlanCtrl',
 
 		    $scope.getTags = function(transaction) {
 			var tag_list = transaction.getOrCreateList('Tags');
-			var ret_list = [];
-			for (var ndx=0; ndx<tag_list.length(); ndx++) {
-			    ret_list.push(tag_list.get(ndx));
-			};
-			if (ret_list.length == 0) {
-			    ret_list.push('No tags');
+			var ret_list = tag_list.toArray();
+			if (tag_list.length() == 0) {
+			    ret_list.push('None');
 			};
 			return ret_list;
 		    };
