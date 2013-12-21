@@ -142,30 +142,21 @@ app.controller('SpendPlanCtrl',
 		    };
 		    
 		    $scope.getCatBalance = function(category) {
-			var start_date = false;
-			var end_date = false;
-
+			var start_date = new Date(2013,5,1);
+			var end_date = new Date();
 			if ($scope.catDate.start != '') {
-			    var start_date_arr = $scope.catDate.start.split('/');
-			    start_date = new Date(start_date_arr[2],
-						      start_date_arr[0]-1,
-						      start_date_arr[1]);
+			    start_date = new Date($scope.catDate.start);
 			};
 			if ($scope.catDate.end != '') {
-			    var end_date_arr = $scope.catDate.end.split('/');
-			    end_date = new Date(end_date_arr[2],
-						    end_date_arr[0]-1,
-						    end_date_arr[1]);
+			    end_date = new Date($scope.catDate.end);
 			};
+			// console.log(start_date,end_date);
 			var cat_trans = _transactionTable.query({"Category": category});
 			var total = 0.0;
 			for ( var ndx in cat_trans) {
 			    var trans = cat_trans[ndx];
-			    var add_to_total = true;
-			    if (start_date && end_date) {
-				add_to_total = ((trans.get('Date') >= start_date) && 
+			    var add_to_total = ((trans.get('Date') >= start_date) && 
 						(trans.get('Date') <= end_date));
-			    };
 			    var amount = trans.get('Amount');
 			    if ($scope.acctTable.get(trans.get('Account')).get('currency') == 'GBP') {
 				amount /= $scope.exchangeRates[trans.get('Date')];
@@ -204,20 +195,10 @@ app.controller('SpendPlanCtrl',
 			var date_min = true;
 			var date_max = true;
 			if ($scope.trans_filter.date_min != '') {
-			    var date_arr = $scope.trans_filter.date_min.split('/');
-			    var date = new Date(date_arr[2],
-						    date_arr[0]-1,
-						    date_arr[1]);
-			    // console.log(date);
-			    date_min = (transaction.get('Date') >= date);
+			    date_min = (transaction.get('Date') >= new Date($scope.trans_filter.date_min));
 			};
 			if ($scope.trans_filter.date_max != '') {
-			    var date_arr = $scope.trans_filter.date_max.split('/');
-			    var date = new Date(date_arr[2],
-						    date_arr[0]-1,
-						    date_arr[1]);
-			    // console.log(date);
-			    date_max = (transaction.get('Date') <= date);
+			    date_max = (transaction.get('Date') <= new Date($scope.trans_filter.date_max));
 			};
 			var account_match = true;
 			

@@ -50,14 +50,10 @@
 	<div class="col-sm-4" >
 	  <h3>Categories</h3>
 	  <div>
-	    <input type="text"
-		   placeholder="MM/DD/YYYY"
-		   style="width:6em"
+	    <input type="date"
 		   ng-model="catDate.start" >
 	    -
-	    <input type="text"
-		   placeholder="MM/DD/YYYY"
-		   style="width:6em"
+	    <input type="date"
 		   ng-model="catDate.end" >
 	  </div>
 	  <div style="max-height:500px;overflow-y:scroll;">
@@ -78,15 +74,14 @@
 	    <th>
 	      Date
 	      <br>
-	      <input type="text"
-		     style="width:4em"
-		     ng-model="trans_filter.date_min"
-		     placeholder="MM/DD/YYYY">
+	      <input type="date"
+		     placeholder="mm/dd/yyyy"
+		     ng-model="trans_filter.date_min" >
+
 	      <br>
-	      <input type="text"
-		     style="width:4em"
-		     ng-model="trans_filter.date_max"
-		     placeholder="MM/DD/YYYY">
+	      <input type="date"
+		     placeholder="mm/dd/yyyy"
+		     ng-model="trans_filter.date_max" >
 	    </th>
 	    <th>
 	      Amount
