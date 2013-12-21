@@ -24,15 +24,15 @@ app.controller('SpendPlanCtrl',
 		    $scope.categories = {};
 		    $scope.edit_category = {
 			tran: null,
-			cat: ""
+			repl: ""
 		    };
 		    $scope.edit_note = {
 			tran: null,
-			note: ""
+			repl: ""
 		    };
 		    $scope.edit_tags = {
 			tran: null,
-			tags: ''
+			repl: ""
 		    };
 		    $scope.trans_filter = {date_min:'',
 					   date_max:'',
@@ -241,47 +241,47 @@ app.controller('SpendPlanCtrl',
 			transaction.deleteRecord();
 		    };
 
-		    $scope.startEditCat = function(transaction) {
-			$scope.edit_category.cat = transaction.get('Category');
-			$scope.edit_category.tran = transaction;
+		    $scope.startEdit = function(transaction,scope_elt) {
+			if (scope_elt == 'edit_tags' ) {
+		    	    $scope[scope_elt].repl = $scope.getTags(transaction);
+			} else if (scope_elt == 'edit_note') {
+		    	    $scope[scope_elt].repl = transaction.get('Note');
+			} else if (scope_elt == 'edit_category') {
+		    	    $scope[scope_elt].repl = transaction.get('Category');
+			};
+		    	$scope[scope_elt].tran = transaction;
 		    };
 
 		    $scope.editCategory = function(transaction) {
-			if ($scope.edit_category.cat != '') {
-			    transaction.set('Category', $scope.edit_category.cat);
+			if ($scope.edit_category.repl != '') {
+			    transaction.set('Category', $scope.edit_category.repl);
 			};
 			$scope.edit_category.tran = null;
-			$scope.edit_category.cat = "";
-		    };
-
-		    $scope.startEditNote = function(transaction) {
-			$scope.edit_note.note = transaction.get('Note');
-			$scope.edit_note.tran = transaction;
+			$scope.edit_category.repl = "";
 		    };
 
 		    $scope.editNote = function(transaction) {
-			if ($scope.edit_note.note != '') {
-			    transaction.set('Note', $scope.edit_note.note);
+			if ($scope.edit_note.repl != '') {
+			    transaction.set('Note', $scope.edit_note.repl);
 			};
 			$scope.edit_note.tran = null;
-			$scope.edit_note.note = "";
-		    };
-		    
-		    $scope.startEditTags = function(transaction) {
-		    	$scope.edit_tags.tags = $scope.getTags(transaction);
-		    	$scope.edit_tags.tran = transaction;
+			$scope.edit_note.repl = "";
 		    };
 
 		    $scope.editTags = function(transaction) {
 			var trans_tags = transaction.getOrCreateList('Tags');
 			var tag_arr = trans_tags.toArray();
-			if ($scope.edit_tags.tags != '') {
-			    var all_tags = $scope.edit_tags.tags.split(',');
+			var cur_num_tags = trans_tags.length();
+			for (var ndx = 0; ndx < cur_num_tags; ndx++ ) {
+			    trans_tags.pop();
+			    console.log(trans_tags);
+			};
+			if ($scope.edit_tags.repl.trim() != '')
+			{
+			    var all_tags = $scope.edit_tags.repl.split(',');
 			    for (var ndx in all_tags) {
 				var cur_tag = all_tags[ndx].trim();
-				if (tag_arr.indexOf(cur_tag) == -1) {
-				    trans_tags.push(cur_tag);
-				};
+				trans_tags.push(cur_tag);
 			    };
 			};
 			$scope.edit_tags.tran = null;
@@ -298,8 +298,8 @@ app.controller('SpendPlanCtrl',
 			return ret_list;
 		    };
 
-		    $scope.thisIsIt = function(transaction) {
-		    	return transaction == $scope.edit_tags.tran;
+		    $scope.thisIsIt = function(transaction,scope_elt) {
+		    	return transaction == $scope[scope_elt].tran;
 		    };
 
 		});

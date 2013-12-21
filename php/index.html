@@ -157,23 +157,26 @@
 	      </span>
 	    </td>
 	    <td ng-class="{ editing: transaction == edit_category.tran }">
-	      <span class="view" ng-dblclick="startEditCat(transaction)">
+	      <span class="view" 
+		    ng-dblclick="startEdit(transaction,'edit_category')">
 		{{ transaction.get('Category') | empty }}
 	      </span>
-	      <span class="edit">
-		<input type="text" ng-model="edit_category.cat" ng-blur="editCategory(transaction)">
+	      <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
+		<input type="text" 
+		       ng-model="edit_category.repl" 
+		       ng-blur="editCategory(transaction)">
 	      </span>
 	    </td>
 	    <td ng-class="{ editing: transaction == edit_tags.tran }"
-		ng-dblclick="startEditTags(transaction)">
+		ng-dblclick="startEdit(transaction,'edit_tags')">
 	      <strong>Tags</strong>:
 	      <span ng-repeat="tag in getTags(transaction)"
 	      	    class="view">
 	      	<span class="label label-default">{{ tag }}</span>
 	      </span>
-	      <span class="edit" ng-if="thisIsIt(transaction)">
+	      <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
 	      	<input type="text"
-	      	       ng-model="edit_tags.tags"
+	      	       ng-model="edit_tags.repl"
 	      	       ng-blur="editTags(transaction)">
 	      </span>
 	    </td>
@@ -188,11 +191,13 @@
 	  <tr ng-repeat-end>
 	    <td colspan="4"
 		ng-class="{ editing: transaction == edit_note.tran }">
-	      <span class="view" ng-dblclick="startEditNote(transaction)">
+	      <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
 		<strong>For</strong>: {{ transaction.get('Note') | empty }}
 	      </span>
-	      <span class="edit">
-		<input type="text" ng-model="edit_note.note" ng-blur="editNote(transaction)">
+	      <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
+		<input type="text" 
+		       ng-model="edit_note.repl" 
+		       ng-blur="editNote(transaction)">
 	      </span>
 	    </td>
 	  </tr>
