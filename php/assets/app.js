@@ -298,6 +298,10 @@ app.controller('SpendPlanCtrl',
 			return ret_list;
 		    };
 
+		    $scope.thisIsIt = function(transaction) {
+		    	return transaction == $scope.edit_tags.tran;
+		    };
+
 		});
 
 

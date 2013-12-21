@@ -171,7 +171,7 @@
 	      	    class="view">
 	      	<span class="label label-default">{{ tag }}</span>
 	      </span>
-	      <span class="edit">
+	      <span class="edit" ng-if="thisIsIt(transaction)">
 	      	<input type="text"
 	      	       ng-model="edit_tags.tags"
 	      	       ng-blur="editTags(transaction)">
