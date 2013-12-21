@@ -22,6 +22,10 @@ app.controller('SpendPlanCtrl',
 		    $scope.accounts = [];
 		    $scope.transactions = {};
 		    $scope.categories = {};
+		    $scope.catDate = {
+			start: '',
+			end: ''
+		    };
 		    $scope.edit_category = {
 			tran: null,
 			repl: ""
@@ -138,15 +142,37 @@ app.controller('SpendPlanCtrl',
 		    };
 		    
 		    $scope.getCatBalance = function(category) {
+			var start_date = false;
+			var end_date = false;
+
+			if ($scope.catDate.start != '') {
+			    var start_date_arr = $scope.catDate.start.split('/');
+			    start_date = new Date(start_date_arr[2],
+						      start_date_arr[0]-1,
+						      start_date_arr[1]);
+			};
+			if ($scope.catDate.end != '') {
+			    var end_date_arr = $scope.catDate.end.split('/');
+			    end_date = new Date(end_date_arr[2],
+						    end_date_arr[0]-1,
+						    end_date_arr[1]);
+			};
 			var cat_trans = _transactionTable.query({"Category": category});
 			var total = 0.0;
 			for ( var ndx in cat_trans) {
 			    var trans = cat_trans[ndx];
+			    var add_to_total = true;
+			    if (start_date && end_date) {
+				add_to_total = ((trans.get('Date') >= start_date) && 
+						(trans.get('Date') <= end_date));
+			    };
 			    var amount = trans.get('Amount');
 			    if ($scope.acctTable.get(trans.get('Account')).get('currency') == 'GBP') {
 				amount /= $scope.exchangeRates[trans.get('Date')];
 			    };
-			    total += amount;
+			    if (add_to_total) {
+				total += amount;
+			    };
 
 			}
 			return total;
