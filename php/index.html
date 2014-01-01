@@ -48,7 +48,7 @@
 	</div>
 	
 	<div class="col-sm-4" >
-	  <h3>Categories</h3>
+	  <h3>Categories:</h3>
 	  <div>
 	    <input type="date"
 		   ng-model="catDate.start" >
@@ -75,11 +75,13 @@
 	      Date
 	      <br>
 	      <input type="date"
+		     style="width:8em"
 		     placeholder="mm/dd/yyyy"
 		     ng-model="trans_filter.date_min" >
 
 	      <br>
 	      <input type="date"
+		     style="width:8em"
 		     placeholder="mm/dd/yyyy"
 		     ng-model="trans_filter.date_max" >
 	    </th>
@@ -122,8 +124,8 @@
 	<tbody>
 	  <tr>
 	    <td>
-	      <input type="text"
-		     style="width:4em"
+	      <input type="date"
+		     style="width:8em"
 	  	     placeholder="MM/DD/YY"
 	  	     ng-model="newTrans.date">
 	    </td>

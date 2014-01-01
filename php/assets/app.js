@@ -22,6 +22,7 @@ app.controller('SpendPlanCtrl',
 		    $scope.accounts = [];
 		    $scope.transactions = {};
 		    $scope.categories = {};
+		    $scope.plan_categories = {};
 		    $scope.catDate = {
 			start: '',
 			end: ''
@@ -225,16 +226,7 @@ app.controller('SpendPlanCtrl',
 		    };
 		    
 		    $scope.addTransaction = function() {
-			// console.log(JSON.stringify($scope.newTrans));
-			var date_arr = $scope.newTrans.date.split('/');
-			if (date_arr[2].length == 2) {
-			    date_arr[2] = '20' + date_arr[2];
-			    // console.log(JSON.stringify(date_arr));
-			};
-			var date = new Date(date_arr[2],
-					    date_arr[0]-1,
-					    date_arr[1]);
-			// console.log(JSON.stringify(date))
+			var date = new Date($scope.newTrans.date);
 			_transactionTable.insert({
 			    Date: date,
 			    Amount: Number($scope.newTrans.amount),
