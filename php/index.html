@@ -23,7 +23,13 @@
       </div>
       <div class="row">
 	<div class="col-sm-4">
-	  <h3>Accounts:</h3>
+	  <h2>Accounts</h2>
+	  <div>
+	    As of
+	    <input type="date"
+		   placeholder="mm/dd/yyyy"
+		   ng-model="acctDate.date" >
+	  </div>
 	  <table class="table table-responsive table-striped">
 	    <tr ng-repeat="account in accounts">
 	      <td>{{ account.get('acctname') }} ({{ account.get('currency') }})</td>
@@ -33,9 +39,9 @@
 	      <td>
 	  	<input type="text"
 	  	       placeholder="New Account"
-	  	       style="width:15em"
+	  	       style="width:10em"
 	  	       ng-model="newAcct.name"> 
-		<select ng-model="newAcct.curr" style="width:6em">
+		<select ng-model="newAcct.curr" style="width:4em">
 	  	  <option value="GBP">GBP</option>
 	  	  <option value="USD">USD</option>
 		</select>
@@ -48,15 +54,17 @@
 	</div>
 	
 	<div class="col-sm-4" >
-	  <h3>Categories:</h3>
+	  <h2>Categories</h2>
 	  <div>
 	    <input type="date"
+		   placeholder="mm/dd/yyyy"
 		   ng-model="catDate.start" >
 	    -
 	    <input type="date"
+		   placeholder="mm/dd/yyyy"
 		   ng-model="catDate.end" >
 	  </div>
-	  <div style="max-height:500px;overflow-y:scroll;">
+	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
 	      <tr ng-repeat="(category,x) in categories">
 		<td>{{ category }}</td>
@@ -67,150 +75,158 @@
 	</div>
       </div> <!-- row -->
 
-      <h3>Transactions:</h3>
-      <table class="table table-responsive table-condensed" id="trans-table">
-	<thead>
-	  <tr>
-	    <th>
-	      Date
-	      <br>
-	      <input type="date"
-		     style="width:8em"
-		     placeholder="mm/dd/yyyy"
-		     ng-model="trans_filter.date_min" >
+      <div class="row">
+	<div class="col-md-2 col-md-push-10">
+	  <h2>Filters</h2>
+	  <h5>Date Range</h5>
+	  <input type="date" 
+		 placeholder="mm/dd/yyyy" 
+		 ng-model="trans_filter.date_min" >
+	  <input type="date"
+		 placeholder="mm/dd/yyyy"
+		 ng-model="trans_filter.date_max" >
+	  <h5>Amount</h5>
+	  <input type="text"
+		 style="width:4em"
+		 ng-model="trans_filter.amount_min"
+		 placeholder="min">
+	  -
+	  <input type="text"
+		 style="width:4em"
+		 ng-model="trans_filter.amount_max"
+		 placeholder="max">
+	  <h5>Category</h5>
+	  <input type="text"
+		 ng-model="trans_filter.category">
+	  <h5>Account</h5>
+	  <input type="text"
+		 ng-model="trans_filter.account" >
+	  <h5>Tags</h5>
+	  <input type="text"
+		 ng-model="trans_filter.tags">
+	  <h5>Note</h5>
+	  <input type="text"
+		 ng-model="trans_filter.note">
+	</div>
 
-	      <br>
-	      <input type="date"
-		     style="width:8em"
-		     placeholder="mm/dd/yyyy"
-		     ng-model="trans_filter.date_max" >
-	    </th>
-	    <th>
-	      Amount
-	      <br>
-	      <input type="text"
-		     style="width:4em"
-		     ng-model="trans_filter.amount_min"
-		     placeholder="min">
-	      <br>
-	      <input type="text"
-		     style="width:4em"
-		     ng-model="trans_filter.amount_max"
-		     placeholder="max">
-	    </th>
-	    <th>
-	      Category
-	      <input type="text"
-		     style="width:7em"
-		     ng-model="trans_filter.category">
-	    </th>
-	    <th>
-	      Note
-	      <br>
-	      <input type="text"
-		     ng-model="trans_filter.note">
-	    </th>
-	    <th>
-	      Account
-	      <br>
-	      <input type="text"
-		     ng-model="trans_filter.account" >
-	    </th>
-	    <th>
-	      Action
-	    </th>
-	  </tr>
-	</thead>
-	<tbody>
-	  <tr>
-	    <td>
-	      <input type="date"
-		     style="width:8em"
-	  	     placeholder="MM/DD/YY"
-	  	     ng-model="newTrans.date">
-	    </td>
-	    <td>
-	      <input type="text"
-		     style="width:4em"
-	  	     placeholder="XX.XX"
-	  	     ng-model="newTrans.amount">
-	    </td>
-	    <td>
-	      <input type="text"
-		     style="width:7em"
-	  	     placeholder="Category"
-	  	     ng-model="newTrans.category">
-	    </td>
-	    <td>
-	      <input type="text"
-	  	     placeholder="New Transaction"
-	  	     style="width:15em"
-	  	     ng-model="newTrans.note">
-	    </td>
-	    <td>
-	      <select ng-model="newTrans.account"
-	  	      ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
-	      </select>
-	    </td>
-	    <td>
-	      <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
-	    </td>
-	  </tr>
-	  <tr ng-repeat-start="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
-	    <td rowspan="2">{{ transaction.get('Date') | date:'shortDate' }}</td>
-	    <td rowspan="2" class="{{ getColor(transaction) }}">
-	      {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
-	      <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
-		<br>{{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
-	      </span>
-	    </td>
-	    <td ng-class="{ editing: transaction == edit_category.tran }">
-	      <span class="view" 
-		    ng-dblclick="startEdit(transaction,'edit_category')">
-		{{ transaction.get('Category') | empty }}
-	      </span>
-	      <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
-		<input type="text" 
-		       ng-model="edit_category.repl" 
-		       ng-blur="editCategory(transaction)">
-	      </span>
-	    </td>
-	    <td ng-class="{ editing: transaction == edit_tags.tran }"
-		ng-dblclick="startEdit(transaction,'edit_tags')">
-	      <strong>Tags</strong>:
-	      <span ng-repeat="tag in getTags(transaction)"
-	      	    class="view">
-	      	<span class="label label-default">{{ tag }}</span>
-	      </span>
-	      <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
-	      	<input type="text"
-	      	       ng-model="edit_tags.repl"
-	      	       ng-blur="editTags(transaction)">
-	      </span>
-	    </td>
-	    <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
-	      ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
-	    <td>
-	      <span class="glyphicon glyphicon-remove"
-		    ng-click="deleteTransaction(transaction)">
-	      </span>
-	    </td>
-	  </tr>
-	  <tr ng-repeat-end>
-	    <td colspan="4"
-		ng-class="{ editing: transaction == edit_note.tran }">
-	      <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
-		<strong>For</strong>: {{ transaction.get('Note') | empty }}
-	      </span>
-	      <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
-		<input type="text" 
-		       ng-model="edit_note.repl" 
-		       ng-blur="editNote(transaction)">
-	      </span>
-	    </td>
-	  </tr>
-	</tbody>
-      </table>
+	<div class="col-md-10 col-md-pull-2">
+	  <h2>Transactions</h2>
+	  <div style="max-height:700px;overflow-y:auto;">
+	    <table class="table table-responsive table-condensed" id="trans-table">
+	      <thead>
+		<tr>
+		  <th>Date</th>
+		  <th>Amount</th>
+		  <th>Category</th>
+		  <th>Note</th>
+		  <th>Account</th>
+		  <th>Action</th>
+		</tr>
+	      </thead>
+	      <tbody>
+		<tr>
+		  <td>
+		    <input type="date"
+			   style="width:8em"
+	  		   placeholder="MM/DD/YYYY"
+	  		   ng-model="newTrans.date">
+		  </td>
+		  <td>
+		    <input type="text"
+			   style="width:4em"
+	  		   placeholder="XX.XX"
+	  		   ng-model="newTrans.amount">
+		  </td>
+		  <td>
+		    <input type="text"
+			   style="width:7em"
+	  		   placeholder="Category"
+	  		   ng-model="newTrans.category">
+		  </td>
+		  <td>
+		    <input type="text"
+	  		   placeholder="Tags"
+	  		   style="width:15em"
+	  		   ng-model="newTrans.tags">
+		  </td>
+		  <td>
+		    <select ng-model="newTrans.account"
+	  		    ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
+		    </select>
+		  </td>
+		  <td>
+		    <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
+		  </td>
+		</tr>
+		<tr>
+		  <td colspan="2">
+		    <strong>New Transation</strong>
+		  </td>
+		  <td colspan="4">
+		    <input type="text"
+	  		   style="width:45em"
+	  		   placeholder="Note"
+	  		   ng-model="newTrans.note">
+		  </td>
+		</tr>
+		<tr ng-repeat-start="transaction in toArray(transactions) | orderBy:getDate:true | filter:catFilter">
+		  <td rowspan="2">{{ transaction.get('Date') | date:'shortDate' }}</td>
+		  <td rowspan="2" class="{{ getColor(transaction) }}">
+		    {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
+		    <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
+		      <br>{{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
+		    </span>
+		  </td>
+		  <td ng-class="{ editing: transaction == edit_category.tran }">
+		    <span class="view" 
+			  ng-dblclick="startEdit(transaction,'edit_category')">
+		      {{ transaction.get('Category') | empty }}
+		    </span>
+		    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
+		      <input type="text" 
+			     ng-model="edit_category.repl" 
+			     ng-blur="editCategory(transaction)">
+		    </span>
+		  </td>
+		  <td ng-class="{ editing: transaction == edit_tags.tran }"
+		      ng-dblclick="startEdit(transaction,'edit_tags')">
+		    <strong>Tags</strong>:
+		    <span ng-repeat="tag in getTags(transaction)"
+	      		  class="view">
+	      	      <span class="label label-default">{{ tag }}</span>
+		    </span>
+		    <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
+	      	      <input type="text"
+	      		     ng-model="edit_tags.repl"
+	      		     ng-blur="editTags(transaction)">
+		    </span>
+		  </td>
+		  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
+		    ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
+		  <td>
+		    <span class="glyphicon glyphicon-remove"
+			  ng-click="deleteTransaction(transaction)">
+		    </span>
+		  </td>
+		</tr>
+		<tr ng-repeat-end>
+		  <td colspan="4"
+		      ng-class="{ editing: transaction == edit_note.tran }">
+		    <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
+		      <strong>For</strong>: {{ transaction.get('Note') | empty }}
+		    </span>
+		    <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
+		      <input type="text" 
+			     ng-model="edit_note.repl" 
+			     ng-blur="editNote(transaction)">
+		    </span>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+	  </div> <!-- scroll div -->
+	</div> <!-- col-md-10 -->
+      </div> <!-- row -->
     </div>
   </body>
 </html>
