@@ -24,38 +24,39 @@
       <div class="row">
 	<div class="col-sm-4">
 	  <h2>Accounts</h2>
-	  <div>
-	    As of
+	  <div style="margin-bottom:.25em">
 	    <input type="date"
 		   placeholder="mm/dd/yyyy"
 		   ng-model="acctDate.date" >
 	  </div>
-	  <table class="table table-responsive table-striped">
-	    <tr ng-repeat="account in accounts">
-	      <td>{{ account.get('acctname') }} ({{ account.get('currency') }})</td>
-	      <td>{{ getBalance(account) | currency:currSymbol(account) }}</td>
-	    </tr>
-	    <tr>
-	      <td>
-	  	<input type="text"
-	  	       placeholder="New Account"
-	  	       style="width:10em"
-	  	       ng-model="newAcct.name"> 
-		<select ng-model="newAcct.curr" style="width:4em">
-	  	  <option value="GBP">GBP</option>
-	  	  <option value="USD">USD</option>
-		</select>
-	      </td>
-	      <td>
-		<button ng-click="addAccount()" class="btn btn-default">Add</button>
-	      </td>
-	    </tr>
-	  </table>
+	  <div style="max-height:500px;overflow-y:auto;">
+	    <table class="table table-responsive table-striped">
+	      <tr ng-repeat="account in accounts">
+		<td>{{ account.get('acctname') }} ({{ account.get('currency') }})</td>
+		<td>{{ getBalance(account) | currency:currSymbol(account) }}</td>
+	      </tr>
+	      <tr>
+		<td>
+	  	  <input type="text"
+	  		 placeholder="New Account"
+	  		 style="width:10em"
+	  		 ng-model="newAcct.name"> 
+		  <select ng-model="newAcct.curr" style="width:4em">
+	  	    <option value="GBP">GBP</option>
+	  	    <option value="USD">USD</option>
+		  </select>
+		</td>
+		<td>
+		  <button ng-click="addAccount()" class="btn btn-default">Add</button>
+		</td>
+	      </tr>
+	    </table>
+	  </div>
 	</div>
 	
 	<div class="col-sm-4" >
 	  <h2>Categories</h2>
-	  <div>
+	  <div style="margin-bottom:.25em">
 	    <input type="date"
 		   placeholder="mm/dd/yyyy"
 		   ng-model="catDate.start" >
@@ -124,7 +125,7 @@
 		</tr>
 	      </thead>
 	      <tbody>
-		<tr>
+		<tr style="background-color:rgba(200,220,255,0.3)">
 		  <td>
 		    <input type="date"
 			   style="width:8em"
@@ -158,7 +159,7 @@
 		    <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
 		  </td>
 		</tr>
-		<tr>
+		<tr style="background-color:rgba(200,220,255,0.3)">
 		  <td colspan="2">
 		    <strong>New Transation</strong>
 		  </td>
