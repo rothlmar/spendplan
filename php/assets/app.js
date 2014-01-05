@@ -1,5 +1,34 @@
 'use strict';
 
+var update_exch_rates = function(date,exch_store) {
+    var max_date = date;
+    var uncovered_dates = [];
+    var yesterday = new Date(new Date()-86400000);
+    yesterday.setHours(0,0,0,0);
+    console.log('yesterday', yesterday);
+    while (max_date.getTime() < yesterday.getTime()) {
+	var temp_date = new Date(max_date.valueOf() + 86400000);
+	uncovered_dates.push(temp_date);
+	max_date = temp_date;
+    };
+    // console.log(JSON.stringify(uncovered_dates));
+
+
+    $.each(uncovered_dates,function(index,value) {
+	var req_str = "http://openexchangerates.org/api/historical/" + value.toJSON().substring(0,10) + ".json?app_id=36646cf83ce04bc1af40246f9015db65"
+	$.get(req_str,function(data) {
+    	    var day_of_rate = new Date(data.timestamp*1000-1000);
+    	    day_of_rate.setHours(0,0,0,0);
+    	    var day_rate = data.rates.GBP;
+    	    console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
+    	    exch_store.insert({
+    		date: day_of_rate,
+    		rate: day_rate
+    	    });
+	});
+    })
+};
+
 var app = angular.module('spendPlan',['dropstore-ng']);
 
 app.filter('empty', function () {
@@ -13,11 +42,12 @@ app.filter('empty', function () {
 });
 
 app.controller('SpendPlanCtrl', 
-	       function SpendPlanCtrl($scope, $timeout, dropstoreClient) {
+	       function SpendPlanCtrl($scope, $timeout, $http, dropstoreClient) {
 		   var _datastore = null;
 		   var _accountTable = null;
 		   var _transactionTable = null;
 		   var _exchangeTable = null;
+		   var latest_date = new Date(0);
 		   $scope.newAcct = {name:'', curr:'USD'};
 		   $scope.accounts = [];
 		   $scope.transactions = {};
@@ -87,14 +117,49 @@ app.controller('SpendPlanCtrl',
 			   }, 'accounts');
 
 
-			   _transactionTable = _datastore.getTable('transactions');
 			   _exchangeTable = _datastore.getTable('exchange_rates')
 			   var temp_rates = _exchangeTable.query();
 			   for (var ndx in temp_rates) {
 			       var rate_date = temp_rates[ndx].get('date');
 			       rate_date.setHours(0,0,0,0);
+			       if (rate_date > latest_date) {
+			       	   latest_date = rate_date;
+			       };
 			       $scope.exchangeRates[rate_date] = temp_rates[ndx].get('rate');
 			   };
+			   _datastore.SubscribeRecordsChanged(function(records) {
+			       for (var ndx in records ){
+				   var rate_date = records[ndx].get('date');
+				   rate_date.setHours(0,0,0,0);
+				   if (rate_date > latest_date) {
+			       	       latest_date = rate_date;
+				   };
+				   $scope.exchangeRates[rate_date] = records[ndx].get('rate');
+			       }
+			   }, 'exchange_rates');
+
+			   // console.log(JSON.stringify(latest_date));
+			   // first time: grab exchange rates previously stored
+			   if (latest_date.getTime() == 0) {
+			       $http({method: 'GET', url: '/rates.json'}).
+				   success(function(data, status, headers, config) {
+				       angular.forEach(data, function(value,ndx) { 
+					   var val_date = new Date(value['date'])
+					   if (val_date.getTime() > latest_date.getTime()) {
+					       latest_date = val_date;
+    					       _exchangeTable.insert({
+    						   date: val_date,
+    						   rate: value['rate']
+    					       });
+					   };
+				       });
+				       update_exch_rates(latest_date,_exchangeTable);
+				   });
+			   } else {
+			       update_exch_rates(latest_date,_exchangeTable);
+			   };
+
+			   _transactionTable = _datastore.getTable('transactions');
 			   var trans_temp = _transactionTable.query();
 			   for (var ndx in trans_temp) {
 			       var record = trans_temp[ndx];
@@ -304,7 +369,7 @@ app.controller('SpendPlanCtrl',
 		       var cur_num_tags = trans_tags.length();
 		       for (var ndx = 0; ndx < cur_num_tags; ndx++ ) {
 			   trans_tags.pop();
-			   console.log(trans_tags);
+			   // console.log(trans_tags);
 		       };
 		       if ($scope.edit_tags.repl.trim() != '')
 		       {
