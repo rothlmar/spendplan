@@ -138,26 +138,29 @@ app.controller('SpendPlanCtrl',
 			       }
 			   }, 'exchange_rates');
 
-			   // console.log(JSON.stringify(latest_date));
+			   console.log(JSON.stringify(latest_date));
 			   // first time: grab exchange rates previously stored
-			   if (latest_date.getTime() == 0) {
-			       $http({method: 'GET', url: '/rates.json'}).
-				   success(function(data, status, headers, config) {
-				       angular.forEach(data, function(value,ndx) { 
-					   var val_date = new Date(value['date'])
+			   $http({method: 'GET', url: '/rates.json'}).
+			       success(function(data, status, headers, config) {
+				   var last_date = latest_date;
+				   angular.forEach(data, function(value,ndx) { 
+				       var val_date = new Date(value['date'])
+				       if (val_date.getTime() > last_date.getTime()) {
+    					   _exchangeTable.insert({
+    					       date: val_date,
+    					       rate: value['rate']
+    					   });
 					   if (val_date.getTime() > latest_date.getTime()) {
 					       latest_date = val_date;
-    					       _exchangeTable.insert({
-    						   date: val_date,
-    						   rate: value['rate']
-    					       });
 					   };
-				       });
-				       update_exch_rates(latest_date,_exchangeTable);
+				       } else {
+					   // console.log(JSON.stringify(val_date),
+					   // 	       JSON.stringify(last_date),
+					   // 	       JSON.stringify(latest_date))
+				       };
 				   });
-			   } else {
-			       update_exch_rates(latest_date,_exchangeTable);
-			   };
+				   update_exch_rates(latest_date,_exchangeTable);
+			       });
 
 			   _transactionTable = _datastore.getTable('transactions');
 			   var trans_temp = _transactionTable.query();

@@ -119,16 +119,16 @@
 	  <h2>Transactions</h2>
 	  <div style="max-height:700px;overflow-y:auto;">
 	    <table class="table table-responsive table-condensed" id="trans-table">
-	      <thead>
-		<tr>
-		  <th>Date</th>
-		  <th>Amount</th>
-		  <th>Category</th>
-		  <th>Note</th>
-		  <th>Account</th>
-		  <th>Action</th>
-		</tr>
-	      </thead>
+	      <!-- <thead> -->
+	      <!-- 	<tr> -->
+	      <!-- 	  <th>Date</th> -->
+	      <!-- 	  <th>Amount</th> -->
+	      <!-- 	  <th>Category</th> -->
+	      <!-- 	  <th>Note</th> -->
+	      <!-- 	  <th>Account</th> -->
+	      <!-- 	  <th>Action</th> -->
+	      <!-- 	</tr> -->
+	      <!-- </thead> -->
 	      <tbody>
 		<tr style="background-color:rgba(200,220,255,0.3)">
 		  <td>
@@ -241,7 +241,7 @@
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
               <h4 class="modal-title" id="myModalLabel">SpendPlan Help</h4>
 	    </div>
-	    <div class="modal-body">
+	    <div class="modal-body" style="max-height:500px;overflow-y:auto">
               <h2>About SpendPlan</h2>
 	      <p>
 		SpendPlan helps you keep track of your finances.  It's kind of like Mint, Quicken, 
@@ -252,35 +252,49 @@
 		<li>
 		  Your records sync automatically and immediately between devices.
 		</li>
-		<li>Your records are private; you're the only person who has access to them.  
-		  SpendPlan doesn't try to advertise to you.
+		<li>
+		  Your records are private; you're the only person who has access to them&ndash;
+		  no advertisements.  (Technically speaking, Dropbox has access to your records.)
 		</li>
 	      </ol>
 	      <h2>How It Works</h2>
 	      <ol>
 		<li>
-		  Add your accounts&ndash;bank accounts, credit cards, whatever.  It's a
+		  Add your accounts&ndash;bank accounts, credit cards, etc.  It's a
 		  good idea to make account names unique, so you don't get confused later on.
+		  Make sure to choose a currency for each account; US Dollars is the default, 
+		  but GB Pounds Sterling is also supported.  For GBP accounts, currency conversions 
+		  are shown using the end-of-day rate for the date of the transaction; when a transaction
+		  involves exchanging currency, this shows whether you got a good rate.  If you would like 
+		  support for additional currencies, please <a href="mailto:rothlmar@gmail.com?subject=SpendPlan%20Currency%20Support">contact the developer</a>.
 		</li>
 		<li>
 		  Add transactions, just as they show up on your online banking or paper 
 		  account statement.  A category is required, e.g. <strong>Groceries</strong>, 
 		  <strong>Entertainment</strong>, or <strong>Travel</strong>. Tags are optional, 
-		  but are usually more specific than a category, e.g. <em>Christmas</em>
-		  or <em>Birthday</em> in the <strong>Gifts</strong>category.   You can add multiple 
+		  if you use them, they're usually more specific than a category, e.g. <em>Christmas</em> 
+		  or <em>Birthday</em> in the <strong>Gifts</strong> category.   You can add multiple 
 		  tags as comma-separated list.
 		</li>
 		<li>
 		  After you've added a transaction, you can change the category, tags, or description; just 
 		  double click on the thing you want to change.  The date, amount, and account can't be
-		  changed.  If you've made a mistake there, delete the transaction and enter it again.
+		  changed.  If you've made a mistake in one of those, delete the transaction and re-enter it.
+		</li>
+		<li>
+		  Filters help you gain insight into your past behavior.  The transaction filters can show
+		  you all of your transactions in a given category or at a given store (assuming you put that
+		  in the note), and the date filters under <strong>Categories</strong> show how
+		  much you earned spent over a specified time period.  The date filter in 
+		  <strong>Accounts</strong> will eventually show you your account balance on the selected
+		  date, but hasn't yet been set up.  Likewise with transaction filtering by tags.
 		</li>
 	      </ol>
 	      <h2>How It's Different</h2>
 	      <ul>
 		<li>
-		  In SpendPlan, there's no distinction between account types.  You can make your own 
-		  decisions about how to use it, but I recommend that all expenditures be registered
+		  In SpendPlan there's no distinction between account types.  You can make your own 
+		  decisions about how to set things up, but I recommend that all expenditures be registered
 		  as negative numbers.  That's not how they look on your credit card statement, which
 		  is a sneaky trick the credit card companies use to make you think spending a lot of
 		  money is good!
@@ -291,9 +305,32 @@
 		  a debit, the other as a credit.
 		</li>
 	      </ul>
+	      <h2>Where It's Going</h2>
+	      <ul>
+		<li>
+		  SpendPlan should live up to its promise of helping you plan your spending.  It isn't
+		  quite there yet.  I have a vision of being able to set goals or targets, which would
+		  be tied to tags and categories.  They could be ongoing, e.g. monthly grocery budget, or
+		  time-limited, e.g. this year's Christmas budget.  I haven't yet finalized my vision of
+		  how this will work; stay tuned.
+		</li>
+		<li>
+		  The way SpendPlan is set up, it can in theory read files that you put in your Dropbox.
+		  Eventually, I pan to make it so you can download an account statement as a CSV file, save it
+		  to Dropbox, then import the transactions in that file directly to SpendPlan.  Don't
+		  expect this to happen anytime soon.
+		</li>
+		<li>
+		  SpendPlan is in active development.  If you're reading this, you're an alpha tester, 
+		  so you know that some things don't work the way you expect, or at all. Please request 
+		  any features that would be helpful to you.
+		</li>
+	      </ul>
 
-	      <span class="glyphicon glyphicon-tower"></span>
-	      <span class="glyphicon glyphicon-tree-deciduous"></span>
+	      <div style="text-align:right">
+		<span class="glyphicon glyphicon-tower"></span>
+		<span class="glyphicon glyphicon-tree-deciduous"></span>
+	      </div>
 	    </div>
 	    <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
