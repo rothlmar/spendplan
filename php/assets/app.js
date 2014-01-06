@@ -94,11 +94,16 @@ app.controller('SpendPlanCtrl',
 		   };
 
 
+		   var acct_name = '';
 		   $scope.exchangeRates = {};
 		   dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 		       .authenticate({interactive: true})
 		       .then(function(datastoreManager) {
 			   console.log('completed authentication');
+			   // dropstoreClient.getAccountInfo({}, function(error, acctinfo, acct_json) {
+			   //     acct_name = acctinfo.name;
+			   //     console.log(acct_name);
+			   // });
 			   return datastoreManager.openDefaultDatastore();
 		       })
 		       .then(function(datastore) {
