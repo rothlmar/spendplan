@@ -5,7 +5,7 @@ var update_exch_rates = function(date,exch_store) {
     var uncovered_dates = [];
     var yesterday = new Date(new Date()-86400000);
     yesterday.setHours(0,0,0,0);
-    console.log('yesterday', yesterday);
+    // console.log('yesterday', JSON.stringify(yesterday));
     while (max_date.getTime() < yesterday.getTime()) {
 	var temp_date = new Date(max_date.valueOf() + 86400000);
 	uncovered_dates.push(temp_date);
@@ -41,8 +41,22 @@ app.filter('empty', function () {
     };
 });
 
+app.filter('winnow', function() {
+    return function(input, winnowFn) {
+	console.log("WINNOWING AWAY");
+	var ret_arr = new Array;
+	for (var i in input) {
+	    if (winnowFn(input[i])) {
+		ret_arr.push(input[i]);
+	    }
+	};
+	return ret_arr;
+    }
+});
+
 app.controller('SpendPlanCtrl', 
-	       function SpendPlanCtrl($scope, $timeout, $http, dropstoreClient) {
+	       function SpendPlanCtrl($scope, $timeout, $http, 
+				      dropstoreClient, winnowFilter, orderByFilter) {
 		   var _datastore = null;
 		   var _accountTable = null;
 		   var _transactionTable = null;
@@ -51,6 +65,51 @@ app.controller('SpendPlanCtrl',
 		   $scope.newAcct = {name:'', curr:'USD'};
 		   $scope.accounts = [];
 		   $scope.transactions = {};
+
+		   $scope.catFilter = function(transaction) {
+		       var cat_pat = new RegExp($scope.loc_trans_filter.category,'gi');
+		       var note_pat = new RegExp($scope.loc_trans_filter.note,'gi');
+		       var acct_pat = new RegExp($scope.loc_trans_filter.account,'gi');
+		       var min_test = true;
+		       var max_test = true;
+		       if ($scope.loc_trans_filter.amount_min != '') {
+			   min_test = (transaction.get('Amount') >= Number($scope.loc_trans_filter.amount_min));
+		       };
+		       if ($scope.loc_trans_filter.amount_max != '') {
+			   max_test = (transaction.get('Amount') <= Number($scope.loc_trans_filter.amount_max));
+		       };
+
+		       var date_min = true;
+		       var date_max = true;
+		       if ($scope.loc_trans_filter.date_min != '') {
+			   date_min = (transaction.get('Date') >= new Date($scope.loc_trans_filter.date_min));
+		       };
+		       if ($scope.loc_trans_filter.date_max != '') {
+			   date_max = (transaction.get('Date') <= new Date($scope.loc_trans_filter.date_max));
+		       };
+		       var account_match = true;
+		       
+		       return cat_pat.test(transaction.get('Category')) & 
+			   note_pat.test(transaction.get('Note')) &
+			   acct_pat.test($scope.acctTable.get(transaction.get('Account')).get('acctname')) &
+			   min_test & max_test &
+			   date_min & date_max;
+		   };
+
+		   $scope.filteredTransactions = [];
+		   $scope.$watchCollection('loc_trans_filter', function() { 
+		       $scope.filteredTransactions = orderByFilter(winnowFilter($scope.transactions,
+		   							    $scope.catFilter),
+		   					       $scope.getDate,true);
+		   });
+		   $scope.$watchCollection('transactions', function() { 
+		       $scope.filteredTransactions = orderByFilter(winnowFilter($scope.transactions,
+		   							    $scope.catFilter),
+		   					       $scope.getDate,true);
+
+		   });
+
+
 		   $scope.categories = {};
 		   $scope.plan_categories = {};
 		   $scope.catDate = {
@@ -143,7 +202,7 @@ app.controller('SpendPlanCtrl',
 			       }
 			   }, 'exchange_rates');
 
-			   console.log(JSON.stringify(latest_date));
+			   // console.log(JSON.stringify(latest_date));
 			   // first time: grab exchange rates previously stored
 			   $http({method: 'GET', url: '/rates.json'}).
 			       success(function(data, status, headers, config) {
@@ -217,6 +276,7 @@ app.controller('SpendPlanCtrl',
 		   };
 
 		   $scope.getBalance = function(account) {
+		       return 0.0;
 		       var acct_trans = _transactionTable.query({"Account": account.getId()});
 		       var total = 0.0;
 		       for ( var ndx in acct_trans) {
@@ -226,6 +286,7 @@ app.controller('SpendPlanCtrl',
 		   };
 		   
 		   $scope.getCatBalance = function(category) {
+		       return 0.0;
 		       var start_date = new Date(2013,5,1);
 		       var end_date = new Date();
 		       if ($scope.catDate.start != '') {
@@ -269,7 +330,7 @@ app.controller('SpendPlanCtrl',
 		       if (filterTimeout) {
 			   $timeout.cancel(filterTimeout);
 		       };
-
+		       
 		       var new_trans_filter = {date_min:newvals.date_min,
 		       			       date_max:newvals.date_max,
 		       			       amount_min:newvals.amount_min,
@@ -278,41 +339,12 @@ app.controller('SpendPlanCtrl',
 		       			       note:newvals.note,
 		       			       account:newvals.account
 		       			      };
-
+		       
 		       filterTimeout = $timeout(function() {
 			   $scope.loc_trans_filter = new_trans_filter;
 		       },1000);
 		   });
 
-		   $scope.catFilter = function(transaction) {
-		       var cat_pat = new RegExp($scope.loc_trans_filter.category,'gi');
-		       var note_pat = new RegExp($scope.loc_trans_filter.note,'gi');
-		       var acct_pat = new RegExp($scope.loc_trans_filter.account,'gi');
-		       var min_test = true;
-		       var max_test = true;
-		       if ($scope.loc_trans_filter.amount_min != '') {
-			   min_test = (transaction.get('Amount') >= Number($scope.loc_trans_filter.amount_min));
-		       };
-		       if ($scope.loc_trans_filter.amount_max != '') {
-			   max_test = (transaction.get('Amount') <= Number($scope.loc_trans_filter.amount_max));
-		       };
-
-		       var date_min = true;
-		       var date_max = true;
-		       if ($scope.loc_trans_filter.date_min != '') {
-			   date_min = (transaction.get('Date') >= new Date($scope.loc_trans_filter.date_min));
-		       };
-		       if ($scope.loc_trans_filter.date_max != '') {
-			   date_max = (transaction.get('Date') <= new Date($scope.loc_trans_filter.date_max));
-		       };
-		       var account_match = true;
-		       
-		       return cat_pat.test(transaction.get('Category')) & 
-			   note_pat.test(transaction.get('Note')) &
-			   acct_pat.test($scope.acctTable.get(transaction.get('Account')).get('acctname')) &
-			   min_test & max_test &
-			   date_min & date_max;
-		   };
 		   
 		   $scope.addAccount = function() {
 		       _accountTable.insert({
@@ -321,13 +353,6 @@ app.controller('SpendPlanCtrl',
 		       });
 		   };
 
-		   $scope.toArray = function(any_obj) {
-		       var any_arr = new Array;
-		       for (var o in any_obj) {
-			   any_arr.push(any_obj[o]);
-		       };
-		       return any_arr;
-		   };
 		   
 		   $scope.addTransaction = function() {
 		       var date = new Date($scope.newTrans.date);
