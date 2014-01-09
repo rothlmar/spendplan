@@ -12,7 +12,7 @@
     
     <script src="https://www.dropbox.com/static/api/dropbox-datastores-1.0-latest.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key="i86ppgkz7etf1vk"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
     <script src="assets/dropstore-ng.js"></script>
     <script src="assets/app.js"></script>
   </head>
@@ -50,8 +50,8 @@
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
 	      <tr ng-repeat="account in accounts">
-		<td>{{ account.get('acctname') }} ({{ account.get('currency') }})</td>
-		<td>{{ getBalance(account) | currency:currSymbol(account) }}</td>
+		<td>{{ account.name }} ({{ account.currency }})</td>
+		<td>{{ account.balance | currency:account.currency_symbol }}</td>
 	      </tr>
 	      <tr>
 		<td>
@@ -85,9 +85,9 @@
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
-	      <tr ng-repeat="(category,x) in categories">
+	      <tr ng-repeat="(category,balance) in categories">
 		<td>{{ category }}</td>
-		<td>{{ getCatBalance(category) | currency}}</td>
+		<td>{{ balance | currency}}</td>
 	      </tr>
 	    </table>
 	  </div>
@@ -135,16 +135,6 @@
 	  <h2>Transactions</h2>
 	  <div style="max-height:700px;overflow-y:auto;">
 	    <table class="table table-responsive table-condensed" id="trans-table">
-	      <!-- <thead> -->
-	      <!-- 	<tr> -->
-	      <!-- 	  <th>Date</th> -->
-	      <!-- 	  <th>Amount</th> -->
-	      <!-- 	  <th>Category</th> -->
-	      <!-- 	  <th>Note</th> -->
-	      <!-- 	  <th>Account</th> -->
-	      <!-- 	  <th>Action</th> -->
-	      <!-- 	</tr> -->
-	      <!-- </thead> -->
 	      <tbody>
 		<tr style="background-color:rgba(200,220,255,0.3)">
 		  <td>
@@ -173,7 +163,7 @@
 		  </td>
 		  <td>
 		    <select ng-model="newTrans.account"
-	  		    ng-options="a.get('acctname') + ' (' + a.get('currency') + ')' for a in accounts">
+	  		    ng-options="a.name + ' (' + a.currency + ')' for a in accounts">
 		    </select>
 		  </td>
 		  <td>
@@ -192,18 +182,18 @@
 		  </td>
 		</tr>
 		
-		<tr ng-repeat-start="transaction in filteredTransactions " >
-		  <td rowspan="2">{{ transaction.get('Date') | date:'shortDate' }}</td>
-		  <td rowspan="2" class="{{ getColor(transaction) }}">
-		    {{ transaction.get('Amount') | currency:currSymbol(acctTable.get(transaction.get('Account'))) }}
-		    <span ng-if="acctTable.get(transaction.get('Account')).get('currency') == 'GBP'">
-		      <br>{{ transaction.get('Amount')/ exchangeRates[transaction.get('Date')] | currency }}
+		<tr ng-repeat-start="transaction in filteredTransactions" >
+		  <td rowspan="2">{{ transaction.date | date:'shortDate' }}</td>
+		  <td rowspan="2" class="{{ transaction.color }}">
+		    {{ transaction.amount | currency:transaction.currency_symbol }}
+		    <span ng-if="transaction.currency == 'GBP'">
+		      <br>{{ transaction.amount/ exchangeRates[transaction.date] | currency }}
 		    </span>
 		  </td>
 		  <td ng-class="{ editing: transaction == edit_category.tran }">
 		    <span class="view" 
 			  ng-dblclick="startEdit(transaction,'edit_category')">
-		      {{ transaction.get('Category') | empty }}
+		      {{ transaction.category | empty }}
 		    </span>
 		    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
 		      <input type="text" 
@@ -214,7 +204,7 @@
 		  <td ng-class="{ editing: transaction == edit_tags.tran }"
 		      ng-dblclick="startEdit(transaction,'edit_tags')">
 		    <strong>Tags</strong>:
-		    <span ng-repeat="tag in getTags(transaction)"
+		    <span ng-repeat="tag in transaction.tags"
 	      		  class="view">
 	      	      <span class="label label-default">{{ tag }}</span>
 		    </span>
@@ -224,11 +214,11 @@
 	      		     ng-blur="editTags(transaction)">
 		    </span>
 		  </td>
-		  <td>{{ acctTable.get(transaction.get('Account')).get('acctname') }}
-		    ({{ acctTable.get(transaction.get('Account')).get('currency') }})</td>
+		  <td>{{ transaction.acct }}
+		    ({{ transaction.currency }})</td>
 		  <td>
 		    <span class="glyphicon glyphicon-remove"
-			  ng-click="deleteTransaction(transaction)">
+			  ng-click="transaction.trans.deleteRecord()">
 		    </span>
 		  </td>
 		</tr>
@@ -236,7 +226,7 @@
 		  <td colspan="4"
 		      ng-class="{ editing: transaction == edit_note.tran }">
 		    <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
-		      <strong>For</strong>: {{ transaction.get('Note') | empty }}
+		      <strong>For</strong>: {{ transaction.note | empty }}
 		    </span>
 		    <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
 		      <input type="text" 
