@@ -86,6 +86,7 @@ app.controller(
 	$scope.newAcct = {name:'', curr:'USD'};
 	$scope.accounts = [];
 	$scope.transactions = {};
+	$scope.acctDate = {date:''};
 	
 	var catFilter = function(transaction) {
 	    var cat_pat = new RegExp($scope.loc_trans_filter.category,'gi');
@@ -306,10 +307,17 @@ app.controller(
 	    });
 	
 	$scope.getBalance = function(account) {
+	    var acct_date = new Date();
+	    if ($scope.acctDate.date != '') {
+		acct_date = new Date($scope.acctDate.date);
+	    }
 	    var acct_trans = _transactionTable.query({"Account": account.getId()});
 	    var total = 0.0;
-	    for ( var ndx in acct_trans) {
-		total += acct_trans[ndx].get('Amount');
+	    for (var ndx in acct_trans) {
+		var trans = acct_trans[ndx];
+		if (trans.get('Date') <= acct_date) {
+		    total += trans.get('Amount');
+		};
 	    }
 	    return total;
 	};
@@ -352,6 +360,18 @@ app.controller(
 	    }
 	};
 	
+	$scope.$watchCollection('catDate', function(newvals, oldvals) {
+	    angular.forEach($scope.categories, function(value,key) {
+		$scope.categories[key] = $scope.getCatBalance(key);
+	    });
+	});
+
+	$scope.$watchCollection('acctDate', function(newvals, oldvals) {
+	    angular.forEach($scope.accounts, function(acct) {
+		acct.balance = $scope.getBalance(acct.acct);
+	    });
+	});
+
 	var filterTimeout;
 	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
 	    if (filterTimeout) {
