@@ -85,15 +85,37 @@
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
-	      <tr ng-repeat="(category,balance) in categories">
+	      <tr ng-repeat="(category,balance) in tags">
 		<td>{{ category }}</td>
 		<td>{{ balance | currency}}</td>
 	      </tr>
 	    </table>
 	  </div>
 	</div>
-      </div> <!-- row -->
 
+	<div class="col-sm-4" >
+	  <h2>Tags</h2>
+	  <div style="margin-bottom:.25em">
+	    <input type="date"
+		   placeholder="mm/dd/yyyy"
+		   ng-model="tagDate.start" >
+	    -
+	    <input type="date"
+		   placeholder="mm/dd/yyyy"
+		   ng-model="tagDate.end" >
+	  </div>
+	  <div style="max-height:500px;overflow-y:auto;">
+	    <table class="table table-responsive table-striped">
+	      <tr ng-repeat="(tag,balance) in categories">
+		<td>{{ tag }}</td>
+		<td>{{ balance | currency}}</td>
+	      </tr>
+	    </table>
+	  </div>
+	</div>
+	
+      </div> <!-- row -->
+      
       <div class="row">
 	<div class="col-md-2 col-md-push-10">
 	  <h2>Filters</h2>
