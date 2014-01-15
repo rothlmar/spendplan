@@ -85,7 +85,7 @@
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
-	      <tr ng-repeat="(category,balance) in tags">
+	      <tr ng-repeat="(category,balance) in categories">
 		<td>{{ category }}</td>
 		<td>{{ balance | currency}}</td>
 	      </tr>
@@ -106,7 +106,7 @@
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
-	      <tr ng-repeat="(tag,balance) in categories">
+	      <tr ng-repeat="(tag,balance) in tags">
 		<td>{{ tag }}</td>
 		<td>{{ balance | currency}}</td>
 	      </tr>

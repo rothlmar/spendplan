@@ -131,8 +131,13 @@ app.controller(
 	});
 	
 	$scope.categories = {};
+	$scope.tags = {};
 	$scope.plan_categories = {};
 	$scope.catDate = {
+	    start: '',
+	    end: ''
+	};
+	$scope.tagDate = {
 	    start: '',
 	    end: ''
 	};
@@ -155,7 +160,8 @@ app.controller(
 	    amount_max:'',
 	    category:'',
 	    note:'',
-	    account:''
+	    account:'',
+	    tags: ''
 	};
 	$scope.loc_trans_filter = {
 	    date_min:'',
@@ -171,7 +177,8 @@ app.controller(
 	    amount: '',
 	    category: '',
 	    note: '',
-	    account: ''
+	    account: '',
+	    tags : ''
 	};
 
 
@@ -269,15 +276,19 @@ app.controller(
 		    var record = trans_temp[ndx];
 		    $scope.transactions[record.getId()] = extractData(record);
 		    var cat_name = record.get('Category');
-		    if (!(cat_name in categories)) {
-			categories[cat_name] = 0;
-		    };
+		    categories[cat_name] = 0;
+		    // angular.forEach($scope.transactions[record.getId()].tags, function(val) {
+		    // 	temp_tags[val] = 0;
+		    // });
 		};
+		
 		for (var key in categories) {
 		    categories[key] = $scope.getCatBalance(key);
      		};
 		$scope.categories = categories;
-		
+		$scope.tags = $scope.getTagBalances();
+
+
 		_datastore.SubscribeRecordsChanged(function(records) {
 		    for (var ndx in records) {
 			var record = records[ndx];
@@ -303,6 +314,7 @@ app.controller(
 			var acct = $scope.accounts[ndx];
 			acct.balance = $scope.getBalance(acct.acct);
 		    }
+		    $scope.tags = $scope.getTagBalances();
 		}, 'transactions');
 	    });
 	
@@ -349,6 +361,27 @@ app.controller(
 	    }
 	    return total;
 	}
+
+	$scope.getTagBalances = function() {
+	    var tags = {};
+	    var start_date = new Date(0);
+	    var end_date = new Date();
+	    if ($scope.tagDate.start != '') {
+		start_date = new Date($scope.tagDate.start);
+	    };
+	    if ($scope.tagDate.end != '') {
+		end_date = new Date($scope.tagDate.end);
+	    };
+	    angular.forEach($scope.transactions, function(trans, ndx) {
+		if (trans.date >= start_date && trans.date <= end_date) {
+		    angular.forEach(trans.tags, function(value) {
+			tags[value] = (tags[value] || 0) + trans.amount;
+		    });
+		};
+	    });
+	    delete tags['None'];
+	    return tags;
+	}
 	
 	$scope.currSymbol = function(trigraph) {
 	    if (trigraph == 'USD') {
@@ -372,23 +405,28 @@ app.controller(
 	    });
 	});
 
+	$scope.$watchCollection('tagDate', function(newvals, oldvals) {
+	    console.log('hello there');
+	    $scope.tags = $scope.getTagBalances();
+	});
+
 	var filterTimeout;
 	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
 	    if (filterTimeout) {
 		$timeout.cancel(filterTimeout);
 	    };
 	    
-	    var new_trans_filter = {date_min:newvals.date_min,
-		       		    date_max:newvals.date_max,
-		       		    amount_min:newvals.amount_min,
-		       		    amount_max:newvals.amount_max,
-		       		    category:newvals.category,
-		       		    note:newvals.note,
-		       		    account:newvals.account
-		       		   };
+	    // var new_trans_filter = {date_min:newvals.date_min,
+	    // 	       		    date_max:newvals.date_max,
+	    // 	       		    amount_min:newvals.amount_min,
+	    // 	       		    amount_max:newvals.amount_max,
+	    // 	       		    category:newvals.category,
+	    // 	       		    note:newvals.note,
+	    // 	       		    account:newvals.account
+	    // 	       		   };
 	    
 	    filterTimeout = $timeout(function() {
-		$scope.loc_trans_filter = new_trans_filter;
+		$scope.loc_trans_filter = angular.copy(newvals);
 	    },1000);
 	});
 	
@@ -402,12 +440,17 @@ app.controller(
 	
 	$scope.addTransaction = function() {
 	    var date = new Date($scope.newTrans.date);
+	    var tag_arr = $scope.newTrans.tags.split(',');
+	    for (var ndx in tag_arr) {
+		tag_arr[ndx] = tag_arr[ndx].trim();
+	    };
 	    _transactionTable.insert({
 		Date: date,
 		Amount: Number($scope.newTrans.amount),
 		Category: $scope.newTrans.category,
 		Note: $scope.newTrans.note,
-		Account: $scope.newTrans.account.acct.getId()
+		Account: $scope.newTrans.account.acct.getId(),
+		Tags: tag_arr
 	    });
 	};
 	
