@@ -70,10 +70,9 @@ app.controller(
 		tags: $scope.getTags(transaction)
 	    };
 	    exp_trans.currency_symbol = $scope.currSymbol(exp_trans.currency);
-	    if (exp_trans.amount >= 0) {
-		exp_trans.color = 'success'
-	    } else {
-		exp_trans.color = 'danger'};
+	    exp_trans.color = (exp_trans.amount >= 0)?'success':'danger';
+	    exp_trans.dollar_amount = (exp_trans.currency == 'USD')?exp_trans.amount:exp_trans.amount/$scope.exchangeRates[exp_trans.date];
+
 	    return exp_trans;
 	};
 	
@@ -89,9 +88,11 @@ app.controller(
 	$scope.acctDate = {date:''};
 	
 	var catFilter = function(transaction) {
+	    // console.log(JSON.stringify($scope.loc_trans_filter))
 	    var cat_pat = new RegExp($scope.loc_trans_filter.category,'gi');
 	    var note_pat = new RegExp($scope.loc_trans_filter.note,'gi');
 	    var acct_pat = new RegExp($scope.loc_trans_filter.account,'gi');
+	    var tag_pat = new RegExp($scope.loc_trans_filter.tags,'gi');
 	    var min_test = true;
 	    var max_test = true;
 	    if ($scope.loc_trans_filter.amount_min != '') {
@@ -110,12 +111,25 @@ app.controller(
 		date_max = (transaction.date <= new Date($scope.loc_trans_filter.date_max));
 	    };
 	    var account_match = true;
+
+	    var tag_match = true;
+	    var tags_not_matched = 0;
+	    angular.forEach(transaction.tags, function(tag) {
+		if (!tag_pat.test(tag)) { 
+		    tags_not_matched += 1;
+		};
+	    });
+
+	    if (tags_not_matched == transaction.tags.length) {
+		tag_match = false;
+	    };
 	    
-	    return cat_pat.test(transaction.category) & 
-		note_pat.test(transaction.note) &
-		acct_pat.test(transaction.acct) &
-		min_test & max_test &
-		date_min & date_max;
+	    return cat_pat.test(transaction.category) &&
+		note_pat.test(transaction.note) &&
+		acct_pat.test(transaction.acct) &&
+		tag_match &&
+		min_test && max_test &&
+		date_min && date_max;
 	};
 	
 	$scope.filteredTransactions = [];
@@ -170,7 +184,8 @@ app.controller(
 	    amount_max:'',
 	    category:'',
 	    note:'',
-	    account:''
+	    account:'',
+	    tags: ''
 	};
 	$scope.newTrans = {
 	    date: '',
@@ -270,30 +285,18 @@ app.controller(
 			update_exch_rates(latest_date,_exchangeTable);
 		    });
 		
-		var trans_temp = _transactionTable.query();
-		var categories = {};
-		for (var ndx in trans_temp) {
-		    var record = trans_temp[ndx];
+	
+		angular.forEach(_transactionTable.query(), function(record) {
 		    $scope.transactions[record.getId()] = extractData(record);
-		    var cat_name = record.get('Category');
-		    categories[cat_name] = 0;
-		    // angular.forEach($scope.transactions[record.getId()].tags, function(val) {
-		    // 	temp_tags[val] = 0;
-		    // });
-		};
+		});
 		
-		for (var key in categories) {
-		    categories[key] = $scope.getCatBalance(key);
-     		};
-		$scope.categories = categories;
+		$scope.categories = $scope.getCatBalances();
 		$scope.tags = $scope.getTagBalances();
 
 
 		_datastore.SubscribeRecordsChanged(function(records) {
 		    for (var ndx in records) {
 			var record = records[ndx];
-			var prev_cat = null;
-			var cur_cat = null;
 			if ($scope.transactions[record.getId()]) {
 			    prev_cat = $scope.transactions[record.getId()].category;
 			};
@@ -301,19 +304,13 @@ app.controller(
 			    delete $scope.transactions[record.getId()];
 			} else {
 			    $scope.transactions[record.getId()] = extractData(record);
-			    cur_cat = record.get('Category');
 			};
-			if (prev_cat) {
-			    $scope.categories[prev_cat] = $scope.getCatBalance(prev_cat);
-			}
-			if (cur_cat) {
-			    $scope.categories[cur_cat] = $scope.getCatBalance(cur_cat);
-			}
 		    };
 		    for (var ndx in $scope.accounts) {
 			var acct = $scope.accounts[ndx];
 			acct.balance = $scope.getBalance(acct.acct);
 		    }
+		    $scope.categories = $scope.getCatBalances();
 		    $scope.tags = $scope.getTagBalances();
 		}, 'transactions');
 	    });
@@ -334,33 +331,23 @@ app.controller(
 	    return total;
 	};
 	
-	$scope.getCatBalance = function(category) {
+	$scope.getCatBalances = function() {
 	    var start_date = new Date(0);
 	    var end_date = new Date();
+	    var categories = {};
 	    if ($scope.catDate.start != '') {
 		start_date = new Date($scope.catDate.start);
 	    };
 	    if ($scope.catDate.end != '') {
 		end_date = new Date($scope.catDate.end);
 	    };
-	    // console.log(start_date,end_date);
-	    var cat_trans = _transactionTable.query({"Category": category});
-	    var total = 0.0;
-	    for ( var ndx in cat_trans) {
-		var trans = cat_trans[ndx];
-		var add_to_total = ((trans.get('Date') >= start_date) && 
-				    (trans.get('Date') <= end_date));
-		var amount = trans.get('Amount');
-		if ($scope.acctTable.get(trans.get('Account')).get('currency') == 'GBP') {
-		    amount /= $scope.exchangeRates[trans.get('Date')];
+	    angular.forEach($scope.transactions, function(trans, ndx) {
+		if (trans.date >= start_date && trans.date <= end_date) {
+		    categories[trans.category] = (categories[trans.category] || 0) + trans.dollar_amount;
 		};
-		if (add_to_total) {
-		    total += amount;
-		};
-		
-	    }
-	    return total;
-	}
+	    });
+	    return categories;
+	};
 
 	$scope.getTagBalances = function() {
 	    var tags = {};
@@ -375,7 +362,7 @@ app.controller(
 	    angular.forEach($scope.transactions, function(trans, ndx) {
 		if (trans.date >= start_date && trans.date <= end_date) {
 		    angular.forEach(trans.tags, function(value) {
-			tags[value] = (tags[value] || 0) + trans.amount;
+			tags[value] = (tags[value] || 0) + trans.dollar_amount;
 		    });
 		};
 	    });
@@ -394,9 +381,7 @@ app.controller(
 	};
 	
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
-	    angular.forEach($scope.categories, function(value,key) {
-		$scope.categories[key] = $scope.getCatBalance(key);
-	    });
+	    $scope.categories = $scope.getCatBalances();
 	});
 
 	$scope.$watchCollection('acctDate', function(newvals, oldvals) {
@@ -406,7 +391,6 @@ app.controller(
 	});
 
 	$scope.$watchCollection('tagDate', function(newvals, oldvals) {
-	    console.log('hello there');
 	    $scope.tags = $scope.getTagBalances();
 	});
 
@@ -415,19 +399,9 @@ app.controller(
 	    if (filterTimeout) {
 		$timeout.cancel(filterTimeout);
 	    };
-	    
-	    // var new_trans_filter = {date_min:newvals.date_min,
-	    // 	       		    date_max:newvals.date_max,
-	    // 	       		    amount_min:newvals.amount_min,
-	    // 	       		    amount_max:newvals.amount_max,
-	    // 	       		    category:newvals.category,
-	    // 	       		    note:newvals.note,
-	    // 	       		    account:newvals.account
-	    // 	       		   };
-	    
 	    filterTimeout = $timeout(function() {
 		$scope.loc_trans_filter = angular.copy(newvals);
-	    },1000);
+	    },500);
 	});
 	
 	
