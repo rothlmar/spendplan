@@ -43,7 +43,7 @@ app.filter('empty', function () {
 
 app.filter('winnow', function() {
     return function(input, winnowFn) {
-	console.log("WINNOWING AWAY");
+	// console.log("WINNOWING AWAY");
 	var ret_arr = new Array;
 	for (var i in input) {
 	    if (winnowFn(input[i])) {
@@ -82,10 +82,77 @@ app.controller(
 	var _exchangeTable = null;
 	var latest_date = new Date(0);
 
+	// for adding stuff
 	$scope.newAcct = {name:'', curr:'USD'};
+	$scope.newTrans = {
+	    date: '',
+	    amount: '',
+	    category: '',
+	    note: '',
+	    account: '',
+	    tags : ''
+	};
+	$scope.column_headers= ['None','Date','Amount','Credit','Debit','Category','Note','Tags',];
+	$scope.newTransactions = {
+	    data: [],
+	    account: null,
+	    date_fmt: 'mm/dd/yy',
+	    debits_negative: "1",
+	    //credits negative/invert amounts?  (Citi card)
+	    cols: []
+	};
+	// data holders
 	$scope.accounts = [];
 	$scope.transactions = {};
+	$scope.filteredTransactions = [];
+	$scope.categories = {};
+	$scope.plan_categories = {}; // not used yet
+	$scope.tags = {};
+	$scope.exchangeRates = {};
+	// filters
 	$scope.acctDate = {date:''};
+	$scope.catDate = {
+	    start: '',
+	    end: ''
+	};
+	$scope.tagDate = {
+	    start: '',
+	    end: ''
+	};
+	$scope.trans_filter = {
+	    date_min:'',
+	    date_max:'',
+	    amount_min:'',
+	    amount_max:'',
+	    category:'',
+	    note:'',
+	    account:'',
+	    tags: ''
+	};
+	$scope.loc_trans_filter = {
+	    date_min:'',
+	    date_max:'',
+	    amount_min:'',
+	    amount_max:'',
+	    category:'',
+	    note:'',
+	    account:'',
+	    tags: ''
+	};
+
+	// editing which
+	$scope.edit_category = {
+	    tran: null,
+	    repl: ""
+	};
+	$scope.edit_note = {
+	    tran: null,
+	    repl: ""
+	};
+	$scope.edit_tags = {
+	    tran: null,
+	    repl: ""
+	};
 	
 	var catFilter = function(transaction) {
 	    // console.log(JSON.stringify($scope.loc_trans_filter))
@@ -132,7 +199,6 @@ app.controller(
 		date_min && date_max;
 	};
 	
-	$scope.filteredTransactions = [];
 	$scope.$watchCollection('loc_trans_filter', function() { 
 	    $scope.filteredTransactions = orderByFilter(winnowFilter($scope.transactions,
 		   						     catFilter),
@@ -143,62 +209,32 @@ app.controller(
 		   						     catFilter),
 		   					'date',true);
 	});
+
+	$scope.$watchCollection('catDate', function(newvals, oldvals) {
+	    $scope.categories = $scope.getCatBalances();
+	});
+
+	$scope.$watchCollection('acctDate', function(newvals, oldvals) {
+	    angular.forEach($scope.accounts, function(acct) {
+		acct.balance = $scope.getBalance(acct.acct);
+	    });
+	});
+
+	$scope.$watchCollection('tagDate', function(newvals, oldvals) {
+	    $scope.tags = $scope.getTagBalances();
+	});
 	
-	$scope.categories = {};
-	$scope.tags = {};
-	$scope.plan_categories = {};
-	$scope.catDate = {
-	    start: '',
-	    end: ''
-	};
-	$scope.tagDate = {
-	    start: '',
-	    end: ''
-	};
-	$scope.edit_category = {
-	    tran: null,
-	    repl: ""
-	};
-	$scope.edit_note = {
-	    tran: null,
-	    repl: ""
-	};
-	$scope.edit_tags = {
-	    tran: null,
-	    repl: ""
-	};
-	$scope.trans_filter = {
-	    date_min:'',
-	    date_max:'',
-	    amount_min:'',
-	    amount_max:'',
-	    category:'',
-	    note:'',
-	    account:'',
-	    tags: ''
-	};
-	$scope.loc_trans_filter = {
-	    date_min:'',
-	    date_max:'',
-	    amount_min:'',
-	    amount_max:'',
-	    category:'',
-	    note:'',
-	    account:'',
-	    tags: ''
-	};
-	$scope.newTrans = {
-	    date: '',
-	    amount: '',
-	    category: '',
-	    note: '',
-	    account: '',
-	    tags : ''
-	};
-
-
-	var dropox_owner_name = '';
-	$scope.exchangeRates = {};
+	var filterTimeout;
+	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
+	    if (filterTimeout) {
+		$timeout.cancel(filterTimeout);
+	    };
+	    filterTimeout = $timeout(function() {
+		$scope.loc_trans_filter = angular.copy(newvals);
+	    },500);
+	});
+	
+	// var dropox_owner_name = '';
 	dropstoreClient.create({key: "i86ppgkz7etf1vk"})
 	    .authenticate({interactive: true})
 	    .then(function(datastoreManager) {
@@ -295,21 +331,16 @@ app.controller(
 
 
 		_datastore.SubscribeRecordsChanged(function(records) {
-		    for (var ndx in records) {
-			var record = records[ndx];
-			if ($scope.transactions[record.getId()]) {
-			    prev_cat = $scope.transactions[record.getId()].category;
-			};
+		    angular.forEach(records, function(record) {
 			if (record.isDeleted()) {
 			    delete $scope.transactions[record.getId()];
 			} else {
 			    $scope.transactions[record.getId()] = extractData(record);
 			};
-		    };
-		    for (var ndx in $scope.accounts) {
-			var acct = $scope.accounts[ndx];
+		    });
+		    angular.forEach($scope.accounts, function(acct) {
 			acct.balance = $scope.getBalance(acct.acct);
-		    }
+		    });
 		    $scope.categories = $scope.getCatBalances();
 		    $scope.tags = $scope.getTagBalances();
 		}, 'transactions');
@@ -380,31 +411,6 @@ app.controller(
 	    }
 	};
 	
-	$scope.$watchCollection('catDate', function(newvals, oldvals) {
-	    $scope.categories = $scope.getCatBalances();
-	});
-
-	$scope.$watchCollection('acctDate', function(newvals, oldvals) {
-	    angular.forEach($scope.accounts, function(acct) {
-		acct.balance = $scope.getBalance(acct.acct);
-	    });
-	});
-
-	$scope.$watchCollection('tagDate', function(newvals, oldvals) {
-	    $scope.tags = $scope.getTagBalances();
-	});
-
-	var filterTimeout;
-	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
-	    if (filterTimeout) {
-		$timeout.cancel(filterTimeout);
-	    };
-	    filterTimeout = $timeout(function() {
-		$scope.loc_trans_filter = angular.copy(newvals);
-	    },500);
-	});
-	
-	
 	$scope.addAccount = function() {
 	    _accountTable.insert({
 		acctname: $scope.newAcct.name,
@@ -463,6 +469,7 @@ app.controller(
 		trans_tags.pop();
 		// console.log(trans_tags);
 	    };
+	    console.log(JSON.stringify($scope.edit_tags.repl));
 	    if ($scope.edit_tags.repl.trim() != '')
 	    {
 		var all_tags = $scope.edit_tags.repl.split(',');
@@ -489,4 +496,76 @@ app.controller(
 	    return transaction == $scope[scope_elt].tran;
 	};
 	
+	$scope.saveIt = function() {
+	    var new_transactions = [];
+	    angular.forEach($scope.newTransactions.data, function(record,indx) {
+		var new_trans = {Date:'', Amount:0.0, Category:'',Note:'',Account:'', Tags:''};
+		angular.forEach($scope.newTransactions.cols, function(val, ndx) {
+		    if ($scope.column_headers.indexOf(val) > 0 ){
+			if (val == 'Note') {
+			    new_trans[val] += record[ndx];
+			} else {
+			    new_trans[val] = record[ndx];
+			};
+		    }
+		});
+		new_trans['Date'] = angular.element.datepicker.parseDate($scope.newTransactions.date_fmt,
+									 new_trans['Date']);
+		new_trans['Account'] = $scope.newTransactions.account.acct.getId();
+		// sometimes there's a $ at the front (Citi card)
+		if (new_trans.hasOwnProperty('Credit') && (new_trans['Credit'].trim() != '')) {
+		    new_trans['Amount'] = Number(new_trans['Credit']);
+		    delete new_trans['Credit'];
+		} else if (new_trans.hasOwnProperty('Debit') && (new_trans['Debit'].trim() != '')) {
+		    new_trans['Amount'] = Number(new_trans['Debit'])*Number($scope.newTransactions['debits_negative']);
+		    delete new_trans['Credit'];
+		} else if (new_trans.hasOwnProperty('Amount') && (new_trans['Amount'].trim() != '')) {
+		    new_trans['Amount'] = Number(new_trans['Amount']);
+		};
+		new_trans['Tags'] = new_trans['Tags'].split(',');
+		for (var ndx in new_trans['Tags']) {
+		    new_trans['Tags'][ndx] = new_trans['Tags'][ndx].trim();
+		};
+		_transactionTable.insert(new_trans);
+	    });
+	    angular.element('#importModal').modal('hide');
+	};
     });
+
+app.directive('dbChooser', function($http) {
+    return {
+	// template: '<input type="dropbox-chooser" name="selected-file"'
+	//     + ' style="visibility:hidden;" data-link-type="direct"'
+	//     + 'id="db-chooser" />',
+	template: '<button class="btn btn-default">Choose from Dropbox</button>',
+	link: function(scope, element, attrs) {
+	    console.log(element);
+	    element.on('click', function() {
+		Dropbox.choose({
+		    success: function(files) {
+			$http.get(files[0].link)
+			    .success(function(data, status, headers, config) {
+				var temp_data = angular.element.csv.toArrays(data);
+				var max_num_cols = 0;
+				angular.forEach(temp_data, function(val) {
+				    if (val.length > max_num_cols) {
+					max_num_cols = val.length;
+				    };
+				});
+				scope.newTransactions.data = temp_data;
+				scope.newTransactions.cols = [];
+				for (var ndx = 0; ndx < max_num_cols; ndx++) {
+				    // scope.newTransactions.cols.push(ndx);
+				    scope.newTransactions.cols.push('None');
+				};
+				// console.log(JSON.stringify(scope.newTransactions));
+				angular.element('#importModal').modal('show');
+			    });
+		    },
+		    linkType: "direct"
+		});
+	    });
+	}
+
+    };
+});
