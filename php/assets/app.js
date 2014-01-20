@@ -514,13 +514,13 @@ app.controller(
 		new_trans['Account'] = $scope.newTransactions.account.acct.getId();
 		// sometimes there's a $ at the front (Citi card)
 		if (new_trans.hasOwnProperty('Credit') && (new_trans['Credit'].trim() != '')) {
-		    new_trans['Amount'] = Number(new_trans['Credit']);
+		    new_trans['Amount'] = Number(new_trans['Credit'].replace(/\$/,''));
 		    delete new_trans['Credit'];
 		} else if (new_trans.hasOwnProperty('Debit') && (new_trans['Debit'].trim() != '')) {
-		    new_trans['Amount'] = Number(new_trans['Debit'])*Number($scope.newTransactions['debits_negative']);
+		    new_trans['Amount'] = Number(new_trans['Debit'].replace(/\$/,''))*Number($scope.newTransactions['debits_negative']);
 		    delete new_trans['Credit'];
 		} else if (new_trans.hasOwnProperty('Amount') && (new_trans['Amount'].trim() != '')) {
-		    new_trans['Amount'] = Number(new_trans['Amount']);
+		    new_trans['Amount'] = Number(new_trans['Amount'].replace(/\$/,''));
 		};
 		new_trans['Tags'] = new_trans['Tags'].split(',');
 		for (var ndx in new_trans['Tags']) {
