@@ -517,11 +517,12 @@ app.controller(
 		    new_trans['Amount'] = Number(new_trans['Credit'].replace(/\$/,''));
 		    delete new_trans['Credit'];
 		} else if (new_trans.hasOwnProperty('Debit') && (new_trans['Debit'].trim() != '')) {
-		    new_trans['Amount'] = Number(new_trans['Debit'].replace(/\$/,''))*Number($scope.newTransactions['debits_negative']);
+		    new_trans['Amount'] = Number(new_trans['Debit'].replace(/\$/,''));
 		    delete new_trans['Credit'];
 		} else if (new_trans.hasOwnProperty('Amount') && (new_trans['Amount'].trim() != '')) {
 		    new_trans['Amount'] = Number(new_trans['Amount'].replace(/\$/,''));
 		};
+		new_trans['Amount'] = new_trans['Amount']*Number($scope.newTransactions['debits_negative']);
 		new_trans['Tags'] = new_trans['Tags'].split(',');
 		for (var ndx in new_trans['Tags']) {
 		    new_trans['Tags'][ndx] = new_trans['Tags'][ndx].trim();
@@ -537,7 +538,7 @@ app.directive('dbChooser', function($http) {
 	// template: '<input type="dropbox-chooser" name="selected-file"'
 	//     + ' style="visibility:hidden;" data-link-type="direct"'
 	//     + 'id="db-chooser" />',
-	template: '<button class="btn btn-default">Choose from Dropbox</button>',
+	template: '<button class="btn btn-default btn-xs">Upload from Dropbox</button>',
 	link: function(scope, element, attrs) {
 	    console.log(element);
 	    element.on('click', function() {

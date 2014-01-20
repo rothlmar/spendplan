@@ -142,7 +142,6 @@
 		 ng-model="trans_filter.note">
 	  </form>
 	  <!-- {{ trans_filter | json }} -->
-	  <div db-chooser style="padding-top:1em"></div>
 	</div>
 	
 	<div class="col-md-10 col-md-pull-2">
@@ -186,7 +185,7 @@
 		</tr>
 		<tr style="background-color:rgba(200,220,255,0.3)">
 		  <td colspan="2">
-		    <strong>Add New Transaction</strong>
+		    <strong>Add New</strong> or <span db-chooser style="padding-top:1em"></span>
 		  </td>
 		  <td colspan="4">
 		    <input type="text"
@@ -272,10 +271,10 @@
 		Date Format: <input type="text" ng-model="newTransactions.date_fmt">
 	      </div>
 	      <div>
-		Debits are negative? <input type="checkbox" 
-					    ng-model="newTransactions.debits_negative"
-					    ng-true-value="1"
-					    ng-false-value="-1" >
+		Invert Amounts? <input type="checkbox" 
+				       ng-model="newTransactions.debits_negative"
+				       ng-true-value="-1"
+				       ng-false-value="1" >
 	      </div>
 	      <table class="table table-condensed"> 
 		<tr>
