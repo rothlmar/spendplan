@@ -15,7 +15,7 @@ var update_exch_rates = function(date,exch_store) {
 
 
     $.each(uncovered_dates,function(index,value) {
-	var req_str = "http://openexchangerates.org/api/historical/" + value.toJSON().substring(0,10) + ".json?app_id=36646cf83ce04bc1af40246f9015db65"
+	var req_str = "https://openexchangerates.org/api/historical/" + value.toJSON().substring(0,10) + ".json?app_id=36646cf83ce04bc1af40246f9015db65"
 	$.get(req_str,function(data) {
     	    var day_of_rate = new Date(data.timestamp*1000-1000);
     	    day_of_rate.setHours(0,0,0,0);
