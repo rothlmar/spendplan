@@ -3,29 +3,36 @@
 var update_exch_rates = function(date,exch_store) {
     var max_date = date;
     var uncovered_dates = [];
-    var yesterday = new Date(new Date()-86400000);
-    yesterday.setHours(0,0,0,0);
-    // console.log('yesterday', JSON.stringify(yesterday));
+    var  yesterday = new Date()
+    yesterday = new Date(Date.UTC(yesterday.getFullYear(),
+				  yesterday.getMonth(),
+				  yesterday.getDate()));	    
+    yesterday = new Date(yesterday-86400000);
+    // yesterday.setHours(0,0,0,0);
+    console.log('yesterday', JSON.stringify(yesterday));
     while (max_date.getTime() < yesterday.getTime()) {
 	var temp_date = new Date(max_date.valueOf() + 86400000);
 	uncovered_dates.push(temp_date);
 	max_date = temp_date;
     };
-    // console.log(JSON.stringify(uncovered_dates));
+    console.log("UNCOVERED: ", JSON.stringify(uncovered_dates));
 
 
     $.each(uncovered_dates,function(index,value) {
-	var req_str = "https://openexchangerates.org/api/historical/" + value.toJSON().substring(0,10) + ".json?app_id=36646cf83ce04bc1af40246f9015db65"
-	$.get(req_str,function(data) {
-    	    var day_of_rate = new Date(data.timestamp*1000-1000);
-    	    day_of_rate.setHours(0,0,0,0);
+    	var req_str = "https://openexchangerates.org/api/historical/" + value.toJSON().substring(0,10) + ".json?app_id=36646cf83ce04bc1af40246f9015db65"
+    	// console.log("getting " + req_str);
+    	$.get(req_str,function(data) {
+    	    var day_of_rate = new Date(data.timestamp*1000);
+	    day_of_rate = new Date(Date.UTC(day_of_rate.getFullYear(),
+					    day_of_rate.getMonth(),
+					    day_of_rate.getDate()));	    
     	    var day_rate = data.rates.GBP;
-    	    console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
+    	    // console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
     	    exch_store.insert({
     		date: day_of_rate,
     		rate: day_rate
     	    });
-	});
+    	});
     })
 };
 
@@ -69,8 +76,12 @@ app.controller(
 		currency: $scope.acctTable.get(transaction.get('Account')).get('currency'),
 		tags: $scope.getTags(transaction)
 	    };
+	    // console.log(JSON.stringify(exp_trans.date));
 	    exp_trans.currency_symbol = $scope.currSymbol(exp_trans.currency);
 	    exp_trans.color = (exp_trans.amount >= 0)?'success':'danger';
+	    if (!$scope.exchangeRates[exp_trans.date] && exp_trans.currency != 'USD') {
+	    	console.log('help me! ', JSON.stringify(exp_trans.date));
+	    }
 	    exp_trans.dollar_amount = (exp_trans.currency == 'USD')?exp_trans.amount:exp_trans.amount/$scope.exchangeRates[exp_trans.date];
 
 	    return exp_trans;
@@ -280,7 +291,8 @@ app.controller(
 		var temp_rates = _exchangeTable.query();
 		for (var ndx in temp_rates) {
 		    var rate_date = temp_rates[ndx].get('date');
-		    rate_date.setHours(0,0,0,0);
+		    // rate_date.setHours(0,0,0,0);
+		    // console.log(JSON.stringify(rate_date));
 		    if (rate_date > latest_date) {
 			latest_date = rate_date;
 		    };
@@ -289,7 +301,7 @@ app.controller(
 		_datastore.SubscribeRecordsChanged(function(records) {
 		    for (var ndx in records ){
 			var rate_date = records[ndx].get('date');
-			rate_date.setHours(0,0,0,0);
+			// rate_date.setHours(0,0,0,0);
 			if (rate_date > latest_date) {
 			    latest_date = rate_date;
 			};
@@ -303,8 +315,12 @@ app.controller(
 		    success(function(data, status, headers, config) {
 			var last_date = latest_date;
 			angular.forEach(data, function(value,ndx) { 
-			    var val_date = new Date(value['date'])
+			    var val_date = new Date(value['date']);
+			    val_date = new Date(Date.UTC(val_date.getFullYear(),
+						     val_date.getMonth(),
+						     val_date.getDate()));
 			    if (val_date.getTime() > last_date.getTime()) {
+				// console.log("found date: ", JSON.stringify(val_date));
     				_exchangeTable.insert({
     				    date: val_date,
     				    rate: value['rate']
@@ -420,6 +436,9 @@ app.controller(
 	
 	$scope.addTransaction = function() {
 	    var date = new Date($scope.newTrans.date);
+	    date = new Date(Date.UTC(date.getFullYear(),
+				     date.getMonth(),
+				     date.getDate()));	    
 	    var tag_arr = $scope.newTrans.tags.split(',');
 	    for (var ndx in tag_arr) {
 		tag_arr[ndx] = tag_arr[ndx].trim();
@@ -503,14 +522,17 @@ app.controller(
 		angular.forEach($scope.newTransactions.cols, function(val, ndx) {
 		    if ($scope.column_headers.indexOf(val) > 0 ){
 			if (val == 'Note') {
-			    new_trans[val] += record[ndx];
+			    new_trans[val] += ' ' + record[ndx];
 			} else {
 			    new_trans[val] = record[ndx];
 			};
 		    }
 		});
-		new_trans['Date'] = angular.element.datepicker.parseDate($scope.newTransactions.date_fmt,
+		var tmp_date = angular.element.datepicker.parseDate($scope.newTransactions.date_fmt,
 									 new_trans['Date']);
+		new_trans['Date'] = new Date(Date.UTC(tmp_date.getFullYear(),
+						      tmp_date.getMonth(),
+						      tmp_date.getDate()));
 		new_trans['Account'] = $scope.newTransactions.account.acct.getId();
 		// sometimes there's a $ at the front (Citi card)
 		if (new_trans.hasOwnProperty('Credit') && (new_trans['Credit'].trim() != '')) {

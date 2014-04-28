@@ -1,12 +1,12 @@
-import calendar, datetime
-import yaml
+import calendar, datetime, json
+import yaml, requests
 import dropbox, dropbox.datastore
 from dateutil import parser
 from csv import reader
 
 
 app_key = 'i86ppgkz7etf1vk'
-access_tokens = yaml.load(open('/home/rothlmar/.dropbox_access_token').read())
+access_tokens = yaml.load(open('/home/rothlmar/.dropbox_access_token'))
 access_token = access_tokens.get(app_key)
 
 if access_token == None:
@@ -72,8 +72,6 @@ def create_records(filename, field_dict, start, end, use_minus=True,date_parse=N
     datastore.commit()
 
 def update_exchange_rates():
-    import json
-    import requests
     exchange_table = datastore.get_table('exchange_rates')
     max_date = max([r.get('date').to_datetime_utc() for r in exchange_table.query()])
     start_date = max_date + datetime.timedelta(1)
@@ -89,4 +87,20 @@ def update_exchange_rates():
         exchange_table.insert(**xr)
     datastore.commit()
 
-    
+
+
+def add_exchange_rate_date(dates):
+    if isinstance(dates, basestring):
+        dates = [dates]
+    exchange_table = datastore.get_table('exchange_rates')
+    req_fmt_str = "http://openexchangerates.org/api/historical/{}.json?app_id=36646cf83ce04bc1af40246f9015db65"
+    req_strs = [req_fmt_str.format(date) for date in dates]
+    responses = [requests.get(rs) for rs in req_strs]
+    json_content = [json.loads(r.content) for r in responses]
+    good_content = [{
+            'date': dropbox.datastore.Date.from_datetime_utc(datetime.datetime.utcfromtimestamp(j['timestamp'])-datetime.timedelta(hours=23)),
+            'rate':j['rates']['GBP']} for j in json_content]
+    print(good_content)
+    for xr in good_content:
+        exchange_table.insert(**xr)
+    datastore.commit()
