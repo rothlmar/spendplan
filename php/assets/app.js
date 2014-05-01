@@ -4,11 +4,10 @@ var update_exch_rates = function(date,exch_store) {
     var max_date = date;
     var uncovered_dates = [];
     var  yesterday = new Date()
-    yesterday = new Date(Date.UTC(yesterday.getFullYear(),
-				  yesterday.getMonth(),
-				  yesterday.getDate()));	    
+    yesterday = new Date(Date.UTC(yesterday.getUTCFullYear(),
+				  yesterday.getUTCMonth(),
+				  yesterday.getUTCDate()));	    
     yesterday = new Date(yesterday-86400000);
-    // yesterday.setHours(0,0,0,0);
     console.log('yesterday', JSON.stringify(yesterday));
     while (max_date.getTime() < yesterday.getTime()) {
 	var temp_date = new Date(max_date.valueOf() + 86400000);
