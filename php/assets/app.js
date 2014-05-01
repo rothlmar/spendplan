@@ -27,7 +27,7 @@ var update_exch_rates = function(date,exch_store) {
 					    day_of_rate.getMonth(),
 					    day_of_rate.getDate()));	    
     	    var day_rate = data.rates.GBP;
-    	    // console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
+    	    console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
     	    exch_store.insert({
     		date: day_of_rate,
     		rate: day_rate
