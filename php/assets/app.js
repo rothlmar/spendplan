@@ -10,9 +10,8 @@ var update_exch_rates = function(date,exch_store) {
     yesterday = new Date(yesterday-86400000);
     console.log('yesterday', JSON.stringify(yesterday));
     while (max_date.getTime() < yesterday.getTime()) {
-	var temp_date = new Date(max_date.valueOf() + 86400000);
-	uncovered_dates.push(temp_date);
-	max_date = temp_date;
+	uncovered_dates.push(max_date);
+	max_date = new Date(max_date.valueOf() + 86400000);
     };
     console.log("UNCOVERED: ", JSON.stringify(uncovered_dates));
 
@@ -333,6 +332,7 @@ app.controller(
 				// 	       JSON.stringify(latest_date))
 			    };
 			});
+			console.log("Latest date with known exchange rate: " + JSON.stringify(latest_date));
 			update_exch_rates(latest_date,_exchangeTable);
 		    });
 		
