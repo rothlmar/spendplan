@@ -34,7 +34,11 @@ var update_exch_rates = function(date,exch_store) {
     })
 };
 
-var app = angular.module('spendPlan',['dropstore-ng']);
+var app = angular.module('spendPlan',['dropstore-ng','ui.bootstrap']);
+
+app.config(function (datepickerConfig) {
+    datepickerConfig.showWeeks = false;
+});
 
 app.filter('empty', function () {
     return function(input) {
@@ -233,6 +237,16 @@ app.controller(
 	    $scope.tags = $scope.getTagBalances();
 	});
 	
+	$scope.open = function($event, dateOpts, opener) {
+	    $event.preventDefault();
+	    $event.stopPropagation();
+	    console.log(opener);
+	    if (!opener) {
+		opener = 'opened';
+	    };
+	    dateOpts[opener] = true;
+	};
+
 	var filterTimeout;
 	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
 	    if (filterTimeout) {

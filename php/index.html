@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"	>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css"> -->
     <link rel="stylesheet" href="assets/css/spendplan.css">
     <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon.png">
     <script src="https://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
@@ -15,8 +15,9 @@
     
     <script src="https://www.dropbox.com/static/api/dropbox-datastores-1.0-latest.js" type="text/javascript"></script>
     <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropins.js" id="dropboxjs" data-app-key="i86ppgkz7etf1vk"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
     <script src="assets/dropstore-ng.js"></script>
+    <script src="assets/ui-bootstrap-tpls-0.11.0.min.js"></script>
     <script src="assets/app.js"></script>
   </head>
   <body ng-controller="SpendPlanCtrl">
@@ -34,9 +35,25 @@
 	<div class="col-sm-4">
 	  <h2>Accounts</h2>
 	  <div style="margin-bottom:.25em">
-	    <input type="date"
-		   placeholder="mm/dd/yyyy"
-		   ng-model="acctDate.date" >
+	    <div class="row">
+	      <div class="col-md-6">
+		<p class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 placeholder="Date"
+			 datepicker-popup="MM/dd/yyyy"
+			 ng-model="acctDate.date" 
+			 is-open="acctDate.opened"
+			 />
+		  <span class="input-group-btn">
+		    <button type="button" class="btn btn-default" 
+			    ng-click="open($event,acctDate)">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		</p>
+	      </div>
+	    </div>
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
@@ -46,14 +63,17 @@
 	      </tr>
 	      <tr>
 		<td>
-	  	  <input type="text"
-	  		 placeholder="New Account"
-	  		 style="width:10em"
-	  		 ng-model="newAcct.name"> 
-		  <select ng-model="newAcct.curr" style="width:4em">
-	  	    <option value="GBP">GBP</option>
-	  	    <option value="USD">USD</option>
-		  </select>
+		  <form class="form-inline">
+	  	    <input type="text"
+			   class="form-control"
+			   style="width:50%"
+	  		   placeholder="New Account"
+	  		   ng-model="newAcct.name"> 
+		    <select ng-model="newAcct.curr" class="form-control">
+	  	      <option value="GBP">£</option>
+	  	      <option value="USD">$</option>
+		    </select>
+		  </form>
 		</td>
 		<td>
 		  <button ng-click="addAccount()" class="btn btn-default">Add</button>
@@ -66,13 +86,44 @@
 	<div class="col-sm-4" >
 	  <h2>Categories</h2>
 	  <div style="margin-bottom:.25em">
-	    <input type="date"
-		   placeholder="mm/dd/yyyy"
-		   ng-model="catDate.start" >
-	    -
-	    <input type="date"
-		   placeholder="mm/dd/yyyy"
-		   ng-model="catDate.end" >
+	    <form class="form-inline">
+	      <div class="row">
+		<div class="col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 placeholder="From"
+			 datepicker-popup="MM/dd/yyyy"
+			 ng-model="catDate.start" 
+			 is-open="catDate.startOpened"
+			 />
+		  <span class="input-group-btn">
+		    <button type="button" class="btn btn-default" 
+			    ng-click="open($event,catDate,'startOpened')">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		</div>
+		</div>
+		<div class="col-md-6">
+		  <div class="input-group">
+		    <input type="text"
+			   class="form-control"
+			   placeholder="To"
+			   datepicker-popup="MM/dd/yyyy"
+			   ng-model="catDate.end" 
+			   is-open="catDate.endOpened"
+			   />
+		    <span class="input-group-btn">
+		      <button type="button" class="btn btn-default" 
+			      ng-click="open($event,catDate,'endOpened')">
+			<i class="glyphicon glyphicon-calendar"></i>
+		      </button>
+		    </span>
+		  </div>
+		</div>
+	      </div>
+	    </form>
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
@@ -87,13 +138,44 @@
 	<div class="col-sm-4" >
 	  <h2>Tags</h2>
 	  <div style="margin-bottom:.25em">
-	    <input type="date"
-		   placeholder="mm/dd/yyyy"
-		   ng-model="tagDate.start" >
-	    -
-	    <input type="date"
-		   placeholder="mm/dd/yyyy"
-		   ng-model="tagDate.end" >
+	    <form class="form-inline">
+	      <div class="row">
+		<div class="col-md-6">
+		<div class="input-group">
+		  <input type="text"
+			 class="form-control"
+			 placeholder="From"
+			 datepicker-popup="MM/dd/yyyy"
+			 ng-model="tagDate.start" 
+			 is-open="tagDate.startOpened"
+			 />
+		  <span class="input-group-btn">
+		    <button type="button" class="btn btn-default" 
+			    ng-click="open($event,tagDate,'startOpened')">
+		      <i class="glyphicon glyphicon-calendar"></i>
+		    </button>
+		  </span>
+		</div>
+		</div>
+		<div class="col-md-6">
+		  <div class="input-group">
+		    <input type="text"
+			   class="form-control"
+			   placeholder="To"
+			   datepicker-popup="MM/dd/yyyy"
+			   ng-model="tagDate.end" 
+			   is-open="tagDate.endOpened"
+			   />
+		    <span class="input-group-btn">
+		      <button type="button" class="btn btn-default" 
+			      ng-click="open($event,tagDate,'endOpened')">
+			<i class="glyphicon glyphicon-calendar"></i>
+		      </button>
+		    </span>
+		  </div>
+		</div>
+	      </div>
+	    </form>
 	  </div>
 	  <div style="max-height:500px;overflow-y:auto;">
 	    <table class="table table-responsive table-striped">
@@ -112,12 +194,36 @@
 	  <h2>Filters</h2>
 	  <form name="filterForm">
 	  <h5>Date Range</h5>
-	  <input type="date" 
-		 placeholder="mm/dd/yyyy" 
-		 ng-model="trans_filter.date_min" >
-	  <input type="date"
-		 placeholder="mm/dd/yyyy"
-		 ng-model="trans_filter.date_max" >
+	  <div class="input-group">
+	    <input type="text"
+		   class="form-control"
+		   placeholder="From"
+		   datepicker-popup="MM/dd/yyyy"
+		   ng-model="trans_filter.date_min" 
+		   is-open="trans_filter.startOpened"
+		   />
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-default" 
+		      ng-click="open($event,trans_filter,'startOpened')">
+		<i class="glyphicon glyphicon-calendar"></i>
+	      </button>
+	    </span>
+	  </div>
+	  <div class="input-group">
+	    <input type="text"
+		   class="form-control"
+		   placeholder="To"
+		   datepicker-popup="MM/dd/yyyy"
+		   ng-model="trans_filter.date_max" 
+		   is-open="trans_filter.endOpened"
+		   />
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-default" 
+		      ng-click="open($event,trans_filter,'endOpened')">
+		<i class="glyphicon glyphicon-calendar"></i>
+	      </button>
+	    </span>
+	  </div>
 	  <h5>Amount</h5>
 	  <input type="text"
 		 style="width:4em"
