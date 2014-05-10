@@ -444,7 +444,8 @@
 		  but GB Pounds Sterling is also supported.  For GBP accounts, currency conversions 
 		  are shown using the end-of-day rate for the date of the transaction; when a transaction
 		  involves exchanging currency, this shows whether you got a good rate.  If you would like 
-		  support for additional currencies, please <a href="mailto:rothlmar@gmail.com?subject=SpendPlan%20Currency%20Support">contact the developer</a>.
+		  support for additional currencies, please 
+		  <a href="mailto:rothlmar@gmail.com?subject=SpendPlan%20Currency%20Support">contact the developer</a>.
 		</li>
 		<li>
 		  Add transactions, just as they show up on your online banking or paper 
@@ -453,6 +454,25 @@
 		  if you use them, they're usually more specific than a category, e.g. <em>Christmas</em> 
 		  or <em>Birthday</em> in the <strong>Gifts</strong> category.   You can add multiple 
 		  tags as comma-separated list.
+		</li>
+		<li>
+		  You can add transactions in bulk by uploading a CSV file.  Usually, this would be a file
+		  that you download or export from your bank or financial institution.  Click on the "Choose File"
+		  or "Upload from Dropbox" button, then follow your nose.
+		  <ul>
+		    <li>Select an account.</li>
+		    <li>Indicate the format for the date (e.g. mm/dd/yy is 07/04/1776).</li>
+		    <li>Choose column headers.  For some accounts, "Credit" and "Debit" will be listed in separate columns,
+		      but most accounts have both in the same column, so choose "Amount".  If debits show up as positive, as they
+		      might on a credit card, check the "Invert Amounts" box.  Finally, it's okay to select more than one column for "Note".
+		    </li>
+		    <li>Delete any superfluous rows, including column headers, by clicking the 
+		      <span class="glyphicon glyphicon-remove"></span> for that row.
+		    </li>
+		    <li>Click <a class="btn btn-primary btn-xs">Save</a>.  If you've made a mistake, nothing will happen, 
+		      so go back and check everything.
+		    </li>
+		  </ul>
 		</li>
 		<li>
 		  After you've added a transaction, you can change the category, tags, or description; just 
@@ -491,12 +511,6 @@
 		  be tied to tags and categories.  They could be ongoing, e.g. monthly grocery budget, or
 		  time-limited, e.g. this year's Christmas budget.  I haven't yet finalized my vision of
 		  how this will work; stay tuned.
-		</li>
-		<li>
-		  The way SpendPlan is set up, it can in theory read files that you put in your Dropbox.
-		  Eventually, I pan to make it so you can download an account statement as a CSV file, save it
-		  to Dropbox, then import the transactions in that file directly to SpendPlan.  Don't
-		  expect this to happen anytime soon.
 		</li>
 		<li>
 		  SpendPlan is in active development.  If you're reading this, you're an alpha tester, 
