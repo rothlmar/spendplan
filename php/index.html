@@ -19,6 +19,31 @@
     <script src="assets/dropstore-ng.js"></script>
     <script src="assets/ui-bootstrap-tpls-0.11.0.min.js"></script>
     <script src="assets/app.js"></script>
+    <script src="assets/sp-directives.js"></script>
+    <script src="assets/sp-filters.js"></script>
+    <script src="assets/sp-helpers.js"></script>
+    <style>
+      .btn-file {
+      position: relative;
+      overflow: hidden;
+      }
+      .btn-file input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 999px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: inherit;
+      display: block;
+      }      
+    </style>
+
   </head>
   <body ng-controller="SpendPlanCtrl">
     <div class="container">
@@ -310,7 +335,7 @@
 		  <td rowspan="2" class="{{ transaction.color }}">
 		    {{ transaction.amount | currency:transaction.currency_symbol }}
 		    <span ng-if="transaction.currency == 'GBP'">
-		      <br>{{ transaction.amount/ exchangeRates[transaction.date] | currency }}
+		      <br>{{ transaction.dollar_amount | currency }}
 		    </span>
 		  </td>
 		  <td ng-class="{ editing: transaction == edit_category.tran }">

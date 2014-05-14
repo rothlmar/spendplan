@@ -1,0 +1,121 @@
+'use strict';
+
+angular.module('spHelpers',[])
+    .value('transLimiter', function(transaction, filt_obj) {
+    	var cat_pat = new RegExp(filt_obj.category,'gi');
+    	var note_pat = new RegExp(filt_obj.note,'gi');
+    	var acct_pat = new RegExp(filt_obj.account,'gi');
+    	var tag_pat = new RegExp(filt_obj.tags,'gi');
+    	var min_test = true;
+    	var max_test = true;
+    	if (filt_obj.amount_min != '') {
+    	    min_test = (transaction.amount >= Number(filt_obj.amount_min));
+    	};
+    	if (filt_obj.amount_max != '') {
+    	    max_test = (transaction.amount <= Number(filt_obj.amount_max));
+    	};
+	
+    	var date_min = true;
+    	var date_max = true;
+    	if (filt_obj.date_min != '') {
+    	    date_min = (transaction.date >= new Date(filt_obj.date_min));
+    	};
+    	if (filt_obj.date_max != '') {
+    	    date_max = (transaction.date <= new Date(filt_obj.date_max));
+    	};
+    	var account_match = true;
+    	var tag_match = true;
+    	var tags_not_matched = 0;
+    	angular.forEach(transaction.tags, function(tag) {
+    	    if (!tag_pat.test(tag)) { 
+    		tags_not_matched += 1;
+    	    };
+    	});
+	
+    	if (tags_not_matched == transaction.tags.length) {
+    	    tag_match = false;
+    	};
+	
+    	return cat_pat.test(transaction.category) &&
+    	    note_pat.test(transaction.note) &&
+    	    acct_pat.test(transaction.acct) &&
+    	    tag_match &&
+    	    min_test && max_test &&
+    	    date_min && date_max;
+    })
+    .value('updateExchangeRates', function(date,exch_store) {
+	var max_date = date;
+	var uncovered_dates = [];
+	var  yesterday = new Date()
+	yesterday = new Date(Date.UTC(yesterday.getUTCFullYear(),
+				      yesterday.getUTCMonth(),
+				      yesterday.getUTCDate()));	    
+	yesterday = new Date(yesterday-86400000);
+	console.log('yesterday', JSON.stringify(yesterday));
+	while (max_date.getTime() < yesterday.getTime()) {
+	    uncovered_dates.push(max_date);
+	    max_date = new Date(max_date.valueOf() + 86400000);
+	};
+	// console.log("UNCOVERED: ", JSON.stringify(uncovered_dates));
+	
+	
+	$.each(uncovered_dates,function(index,value) {
+    	    var req_str = "https://openexchangerates.org/api/historical/" 
+		+ value.toJSON().substring(0,10) 
+		+ ".json?app_id=36646cf83ce04bc1af40246f9015db65"
+    	    // console.log("getting " + req_str);
+    	    $.get(req_str,function(data) {
+    		var day_of_rate = new Date(data.timestamp*1000);
+		day_of_rate = new Date(Date.UTC(day_of_rate.getFullYear(),
+						day_of_rate.getMonth(),
+						day_of_rate.getDate()));	    
+    		var day_rate = data.rates.GBP;
+    		console.log("ADDING DAY:", day_rate, JSON.stringify(day_of_rate));
+    		exch_store.insert({
+    		    date: day_of_rate,
+    		    rate: day_rate
+    		});
+    	    });
+	});
+    })
+    .value('extractData', function(transaction, account, exch_rate) {
+	var getTags = function(transaction) {
+	    var tag_list = transaction.getOrCreateList('Tags');
+	    var ret_list = tag_list.toArray();
+	    if (tag_list.length() == 0) {
+		ret_list.push('None');
+	    };
+	    return ret_list;
+	};
+
+	var currSymbol = function(trigraph) {
+	    if (trigraph == 'USD') {
+		return '$';
+	    } else if (trigraph == 'GBP') {
+		return '£';
+	    } else {
+		return "ERR";
+	    }
+	};
+	
+	var exp_trans = {
+	    trans: transaction,
+	    amount: transaction.get('Amount'),
+	    date: transaction.get('Date'),
+	    note: transaction.get('Note'),
+	    category: transaction.get('Category'),
+	    acct: account.get('acctname'),
+	    currency: account.get('currency'),
+	    tags: getTags(transaction)
+	    // splits: getSplit(transaction)
+	};
+	// console.log(JSON.stringify(exp_trans.date));
+	exp_trans.currency_symbol = currSymbol(exp_trans.currency);
+	exp_trans.color = (exp_trans.amount >= 0)?'success':'danger';
+	// if (!$scope.exchangeRates[exp_trans.date] && exp_trans.currency != 'USD') {
+	//     console.log('help me! ', JSON.stringify(exp_trans.date));
+	// }
+	exp_trans.dollar_amount = (exp_trans.currency == 'USD')?exp_trans.amount:exp_trans.amount/exch_rate;
+	return exp_trans;
+    });
+
