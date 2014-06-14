@@ -205,7 +205,9 @@ app.controller(
 			if (record.isDeleted()) {
 			    delete $scope.transactions[record.getId()];
 			} else {
-			    $scope.transactions[record.getId()] = extractData(record);
+			    $scope.transactions[record.getId()] = extractData(record,
+				    $scope.acctTable.get(record.get('Account')),
+				    $scope.exchangeRates[record.get('Date')]);
 			};
 		    });
 		    angular.forEach($scope.accounts, function(acct) {
