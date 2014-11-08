@@ -93,6 +93,7 @@ app.controller(
 		$timeout.cancel(filterTimeout);
 	    };
 	    filterTimeout = $timeout(function() {
+		console.log(newvals, oldvals);
 		var allFilteredTransactions = orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
 		    'date',true)
