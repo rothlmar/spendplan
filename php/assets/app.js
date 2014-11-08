@@ -69,6 +69,11 @@ app.controller(
 		.slice(0, $scope.trans_filter.number);
 	});
 
+	$scope.inc_trans_filter = function() {
+	    $scope.trans_filter.number += 100;
+	    $scope.$digest();
+	};
+
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
 	    $scope.categories = getCatBalances();
 	});
