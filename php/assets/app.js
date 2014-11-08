@@ -66,7 +66,7 @@ app.controller(
 		orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		    'date',true)
-		.slice(0, newvals.number);
+		.slice(0, $scope.trans_filter.number);
 	});
 
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
