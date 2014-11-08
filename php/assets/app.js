@@ -99,8 +99,8 @@ app.controller(
 		$timeout.cancel(filterTimeout);
 	    };
 	    filterTimeout = $timeout(function() {
-		console.log(newvals, oldvals);
 		$scope.how_many.count = 100;
+		console.log('here we go');
 		$scope.FilteredTransactions = orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
 		    'date',true).slice(0, $scope.how_many.count);
