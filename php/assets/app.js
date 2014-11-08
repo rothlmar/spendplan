@@ -53,8 +53,9 @@ app.controller(
 	     category:'', 
 	     note:'', 
 	     account:'', 
-	     tags: '',
-	     number: 100};
+	     tags: ''};
+
+	$scope.how_many = {count: 100 }
 
 	// editing which
 	$scope.edit_category = {tran: null, repl: ""};
@@ -66,11 +67,16 @@ app.controller(
 		orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		    'date',true)
-		.slice(0, $scope.trans_filter.number);
+		.slice(0, $scope.how_many.count);
 	});
 
-	$scope.inc_trans_filter = function() {
-	    $scope.trans_filter.number += 100;
+	$scope.show_more = function() {
+	    $scope.how_many.count += 100;
+	    $scope.filteredTransactions = 
+		orderByFilter(
+		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
+		    'date',true)
+		.slice(0, $scope.how_many.count);
 	};
 
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
@@ -94,19 +100,10 @@ app.controller(
 	    };
 	    filterTimeout = $timeout(function() {
 		console.log(newvals, oldvals);
-		var allFilteredTransactions = orderByFilter(
+		$scope.how_many.count = 100;
+		$scope.FilteredTransactions = orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
-		    'date',true)
-		if (newvals.number != oldvals.number) {
-		    $scope.filteredTransactions = allFilteredTransactions
-			.slice(0, newvals.number);
-		    console.log('increased to: ' + newvals.number);
-		} else {
-		    $scope.trans_filter.number = 100;
-		    $scope.filteredTransactions = allFilteredTransactions
-			.slice(0, $scope.trans_filter.number);
-		    console.log('reset to: ' + $scope.trans_filter.number);
-		}
+		    'date',true).slice(0, $scope.how_many.count);
 	    },500);
 	});
 	
