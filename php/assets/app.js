@@ -46,8 +46,15 @@ app.controller(
 	$scope.catDate = {start: '', end: ''};
 	$scope.tagDate = {start: '', end: ''};
 	$scope.trans_filter = 
-	    {date_min:'', date_max:'', amount_min:'', amount_max:'', category:'',
-	     note:'', account:'', tags: ''};
+	    {date_min:'', 
+	     date_max:'', 
+	     amount_min:'', 
+	     amount_max:'', 
+	     category:'', 
+	     note:'', 
+	     account:'', 
+	     tags: '',
+	     number: 100};
 
 	// editing which
 	$scope.edit_category = {tran: null, repl: ""};
@@ -58,7 +65,8 @@ app.controller(
 	    $scope.filteredTransactions = 
 		orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
-		    'date',true);
+		    'date',true)
+		.slice(0, newvals.number);
 	});
 
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
@@ -81,10 +89,19 @@ app.controller(
 		$timeout.cancel(filterTimeout);
 	    };
 	    filterTimeout = $timeout(function() {
-		$scope.filteredTransactions = 
-		    orderByFilter(
-			dictValFilter($scope.transactions,transLimiter,newvals),
-			'date',true);
+		var allFilteredTransactions = orderByFilter(
+		    dictValFilter($scope.transactions,transLimiter,newvals),
+		    'date',true)
+		if (newvals.number != oldvals.number) {
+		    $scope.filteredTransactions = allFilteredTransactions
+			.slice(0, newvals.number);
+		    console.log('increased to: ' + newvals.number);
+		} else {
+		    $scope.trans_filter.number = 100;
+		    $scope.filteredTransactions = allFilteredTransactions
+			.slice(0, $scope.trans_filter.number);
+		    console.log('reset to: ' + $scope.trans_filter.number);
+		}
 	    },500);
 	});
 	
