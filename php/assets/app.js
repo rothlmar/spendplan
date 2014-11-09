@@ -90,6 +90,10 @@ app.controller(
 	var filterTimeout;
 
 	$scope.$watchCollection('transactions', function() { 
+	    if (filterTimeout) {
+		$timeout.cancel(filterTimeout);
+	    };
+	    filterTimeout = $timeout(function() {
 	    var tempFiltTrans = orderByFilter(
 		dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		'date',true);
@@ -97,6 +101,7 @@ app.controller(
 	    $scope.filteredTransactions = tempFiltTrans
 		.slice(($scope.pager.page_num-1)*100, 
 		       $scope.pager.page_num*100);
+	    }, 500);
 	});
 
 	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
@@ -107,7 +112,7 @@ app.controller(
 		$scope.pager.page_num = 1;
 		console.log('here we go');
 		var tempFiltTrans = orderByFilter(
-		    dictValFilter($scope.transactions,transLimiter,newvals),
+		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		    'date',
 		    true);
 		$scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
