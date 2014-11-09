@@ -101,7 +101,7 @@ app.controller(
 		$timeout.cancel(filterTimeout);
 	    };
 	    filterTimeout = $timeout(function() {
-		$scope.how_many.count = 100;
+		$scope.pager.page_num = 1;
 		console.log('here we go');
 		$scope.filteredTransactions = orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
