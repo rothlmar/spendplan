@@ -275,14 +275,14 @@
 	  <ul class="pager">
 	  <li>
 	    <a ng-click="change_page(-1)"
-	       ng-disabled="pager.page_num == 1">
+	       ng-hide="pager.page_num == 1">
 	      &larr;
 	    </a>
 	  </li>
 	  <li>{{ pager.page_num }} of {{ pager.num_pages }}</li>
 	  <li>
 	    <a ng-click="change_page(1)"
-	       ng-disabled="pager.page_num == pager.num_pages">
+	       ng-hide="pager.page_num == pager.num_pages">
 	      &rarr;
 	    </a>
 	  </li>
