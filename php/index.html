@@ -272,10 +272,12 @@
 	  <input type="text"
 		 ng-model="trans_filter.note">
 	  </form>
-	  <button class="btn btn-default"
-		  ng-click="show_more()">
-	    Show More
+	  <ul class="pager">
+	  <li><a ng-click="change_page(-1)">Previous</a></li>
+	  <li>{{ pager.page_num }}</li>
+	  <li><a ng-click="change_page(1)">Next</a></li>
 	  </button>
+	  </ul>
 	  <!-- {{ trans_filter | json }} -->
 	</div>
 	

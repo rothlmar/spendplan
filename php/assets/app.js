@@ -55,7 +55,7 @@ app.controller(
 	     account:'', 
 	     tags: ''};
 
-	$scope.how_many = {count: 100 }
+	$scope.pager = {page_num: 1 }
 
 	// editing which
 	$scope.edit_category = {tran: null, repl: ""};
@@ -67,16 +67,18 @@ app.controller(
 		orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		    'date',true)
-		.slice(0, $scope.how_many.count);
+		.slice(($scope.pager.page_num-1)*100, 
+		       $scope.pager.page_num*100);
 	});
 
-	$scope.show_more = function() {
-	    $scope.how_many.count += 100;
+	$scope.change_page = function(idx) {
+	    $scope.pager.page_num += idx;
 	    $scope.filteredTransactions = 
 		orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
 		    'date',true)
-		.slice(0, $scope.how_many.count);
+		.slice(($scope.pager.page_num-1)*100, 
+		       $scope.pager.page_num*100);
 	};
 
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
@@ -105,7 +107,8 @@ app.controller(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
 		    'date',
 		    true)
-		    .slice(0, $scope.how_many.count);
+		    .slice(($scope.pager.page_num-1)*100, 
+			  $scope.pager.page_num*100);
 	    },500);
 	});
 	
