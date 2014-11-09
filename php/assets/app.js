@@ -55,21 +55,13 @@ app.controller(
 	     account:'', 
 	     tags: ''};
 
-	$scope.pager = {page_num: 1 }
+	$scope.pager = {page_num: 1, num_pages: 1 };
 
 	// editing which
 	$scope.edit_category = {tran: null, repl: ""};
 	$scope.edit_note = {tran: null, repl: ""};
 	$scope.edit_tags = {tran: null, repl: ""};
 	
-	$scope.$watchCollection('transactions', function() { 
-	    $scope.filteredTransactions = 
-		orderByFilter(
-		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
-		    'date',true)
-		.slice(($scope.pager.page_num-1)*100, 
-		       $scope.pager.page_num*100);
-	});
 
 	$scope.change_page = function(idx) {
 	    $scope.pager.page_num += idx;
@@ -96,6 +88,17 @@ app.controller(
 	});
 
 	var filterTimeout;
+
+	$scope.$watchCollection('transactions', function() { 
+	    var tempFiltTrans = orderByFilter(
+		dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
+		'date',true);
+	    $scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
+	    $scope.filteredTransactions = tempFiltTrans
+		.slice(($scope.pager.page_num-1)*100, 
+		       $scope.pager.page_num*100);
+	});
+
 	$scope.$watchCollection('trans_filter', function(newvals, oldvals) {
 	    if (filterTimeout) {
 		$timeout.cancel(filterTimeout);
@@ -103,12 +106,14 @@ app.controller(
 	    filterTimeout = $timeout(function() {
 		$scope.pager.page_num = 1;
 		console.log('here we go');
-		$scope.filteredTransactions = orderByFilter(
+		var tempFiltTrans = orderByFilter(
 		    dictValFilter($scope.transactions,transLimiter,newvals),
 		    'date',
-		    true)
+		    true);
+		$scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
+		$scope.filteredTransactions = tempFiltTrans
 		    .slice(($scope.pager.page_num-1)*100, 
-			  $scope.pager.page_num*100);
+			   $scope.pager.page_num*100);
 	    },500);
 	});
 	
