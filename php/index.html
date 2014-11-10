@@ -365,13 +365,12 @@
 		    <span class="view" 
 			  ng-dblclick="startEdit(transaction,'edit_category')">
 		      {{ transaction.category | empty }}
-		      <a href="#"
-			 data-toggle="popover"
-			 data-title="Splits"
-			 data-content="{{ transaction.category }}"
-			 data-trigger="focus">
-			<span class="glyphicon glyphicon-list"></span>
-		      </a>
+			<span class="glyphicon glyphicon-list"
+			      data-toggle="popover"
+			      data-title="Splits"
+			      data-content="{{ transaction.category }}"
+			      data-trigger="focus">
+			</span>
 		    </span>
 		    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
 		      <input type="text" 
