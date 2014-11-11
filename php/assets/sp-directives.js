@@ -74,7 +74,8 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 	'splitPopover', function() {
 	    return {
 		link: function(scope, element, attrs) {
-		    element.popover();
+		    console.log('what is up?');
+		    element.popover({title: "Splits"});
 		}
 	    }
 	})
