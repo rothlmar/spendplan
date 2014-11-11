@@ -33,6 +33,7 @@ app.controller(
 	    //credits negative/invert amounts?  (Citi card)
 	    cols: []
 	};
+	$scope.newSplit = {amount: 0, cat: ''}
 	// data holders
 	$scope.accounts = [];
 	$scope.transactions = {};

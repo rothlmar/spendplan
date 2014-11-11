@@ -75,8 +75,9 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 	    var templ_str = '<span class="glyphicon glyphicon-list" data-content=\'<table class="table table-condensed"><tr><td>'
 		+ '{{ transaction.category }}</td><td>{{ transaction.amount }}'
 		+ '</td></tr>'
-		+ '<tr><td><input type="text" style="width:5em"></td>'
-		+ '<td><input type="text" style="with:3em"> +</td></tr>'
+		+ '<tr><td><input type="text" style="width:5em" ng-model="newSplit.cat"></td>'
+		+ '<td><input type="text" style="with:3em" ng-model="newSplit.amout">'
+		+ '<span ng-click="console.log(newSplit)">+</span></td></tr>'
 		+ '</table>\'></span>';
 
 	    return {
@@ -85,7 +86,7 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		template: templ_str,
 		replace: true,
 		link: function(scope, element, attrs) {
-		    console.log(scope);
+		    // console.log(scope);
 		    // var trans=scope.transaction;
 		    // console.log(trans);
 		    // var content = 
