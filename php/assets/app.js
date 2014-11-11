@@ -371,10 +371,6 @@ app.controller(
 	    $scope.edit_note.repl = "";
 	};
 	
-	$scope.anything = function() {
-	    console.log('anything just happened: ' + JSON.stringify($scope.newSplit));
-	};
-
 	$scope.editTags = function(transaction) {
 	    var trans_tags = transaction.trans.getOrCreateList('Tags');
 	    var tag_arr = trans_tags.toArray();
