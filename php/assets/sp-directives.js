@@ -79,7 +79,7 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		+ '</table>';
 
 	    return {
-		transclude=true,
+		transclude: true,
 		template: templ_str,
 		link: function(scope, element, attrs) {
 		    // var trans=scope.transaction;
