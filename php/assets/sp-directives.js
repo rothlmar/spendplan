@@ -69,4 +69,12 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		}
 		
 	    };
-	});
+	})
+    .directive(
+	'splitPopover', function() {
+	    return {
+		link: function(scope, element, attrs) {
+		    element.popover();
+		}
+	    }
+	})

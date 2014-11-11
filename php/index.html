@@ -22,13 +22,6 @@
     <script src="assets/sp-directives.js"></script>
     <script src="assets/sp-filters.js"></script>
     <script src="assets/sp-helpers.js"></script>
-    <script>
-      $(document).ready(function() {
-      $('body').popover({
-        selector: '[data-toggle="popover"]'
-      });
-      });
-    </script>
     <style>
       .btn-file {
       position: relative;
@@ -366,6 +359,7 @@
 			  ng-dblclick="startEdit(transaction,'edit_category')">
 		      {{ transaction.category | empty }}
 			<span class="glyphicon glyphicon-list"
+			      splitPopover
 			      data-toggle="popover"
 			      data-title="Splits"
 			      data-content="{{ transaction.category }}"
