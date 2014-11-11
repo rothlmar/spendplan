@@ -79,7 +79,9 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		    console.log(trans);
 		    var content = '<table class="table table-condensed"><tr><td>' 
 			+trans.category + "</td><td>" + trans.amount
-			+ '</td></tr></table>';
+			+ '</td></tr>'
+			+'<tr><td><input type="text"></td><td><input type="text"> +</td></tr>'
+			+ '</table>';
 		    // console.log(scope, attrs);
 		    element.popover({html: true,
 				     content: content});
