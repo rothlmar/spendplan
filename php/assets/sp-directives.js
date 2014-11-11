@@ -72,16 +72,19 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 	})
     .directive(
 	'splitPopover', function() {
+	    var templ_str = '<table class="table table-condensed"><tr><td>'
+		+ '{{ transaction.category }}</td><td>{{ transaction.amount }}'
+		+ '</td></tr>'
+		+'<tr><td><input type="text"></td><td><input type="text"> +</td></tr>'
+		+ '</table>';
+
 	    return {
-		scope: true,
+		transclude=true,
+		template: templ_str,
 		link: function(scope, element, attrs) {
-		    var trans=scope.transaction;
-		    console.log(trans);
-		    var content = '<table class="table table-condensed"><tr><td>' 
-			+trans.category + "</td><td>" + trans.amount
-			+ '</td></tr>'
-			+'<tr><td><input type="text"></td><td><input type="text"> +</td></tr>'
-			+ '</table>';
+		    // var trans=scope.transaction;
+		    // console.log(trans);
+		    // var content = 
 		    // console.log(scope, attrs);
 		    element.popover({html: true,
 				     content: content});
