@@ -394,7 +394,12 @@ app.controller(
 	};
 	
 	$scope.showSplits = function(transaction) {
-	    $scope.edit_splits.tran = transaction;
+	    if ($scope.edit_splits.tran == transaction) {
+		$scope.edit_splits.tran = null;
+	    } else {
+		$scope.edit_splits.tran = transaction;
+	    }
+
 	}
 
 	$scope.thisIsIt = function(transaction,scope_elt) {
