@@ -62,7 +62,7 @@ app.controller(
 	$scope.edit_category = {tran: null, repl: ""};
 	$scope.edit_note = {tran: null, repl: ""};
 	$scope.edit_tags = {tran: null, repl: ""};
-	$scope.edit_splits = {tran: null, repl: ""};
+	$scope.edit_splits = {tran: null, repl: "", add_cat: "", add_amt: 0};
 	
 
 	$scope.change_page = function(idx) {
@@ -394,14 +394,50 @@ app.controller(
 	};
 	
 	$scope.showSplits = function(transaction) {
+	    $scope.edit_splits.add_cat = "";
+	    $scope.edit_splits.add_amt = 0;
 	    if ($scope.edit_splits.tran == transaction) {
 		$scope.edit_splits.tran = null;
-		console.log("Splits are: ", transaction.splits);
 	    } else {
 		$scope.edit_splits.tran = transaction;
 	    }
 
-	}
+	};
+
+	$scope.mainAmount = function(transaction) {
+	    var total = transaction.amount;
+	    angular.forEach(transaction.splits, function(val, key) {
+		total -= val;
+	    });
+	    return total;
+	};
+
+	$scope.addSplit = function(transaction) {
+	    if ($scope.edit_splits.add_cat) {
+		transaction.splits[$scope.edit_splits.add_cat] = $scope.edit_splits.add_amt;
+		$scope.edit_splits.add_cat = "";
+		$scope.edit_splits.add_amt = 0;
+	    };
+	};
+
+	$scope.removeSplit = function(transaction, category) {
+	    delete transaction.splits[category];
+	};
+
+	$scope.saveSplits = function(transaction) {
+	    var trans_splits = transaction.trans.getOrCreateList('Splits');
+	    var split_arr = trans_splits.toArray();
+	    var cur_num_splits = trans_splits.length();
+	    for (var ndx = 0; ndx < cur_num_splits; ndx ++) {
+		trans_splits.pop();
+	    }
+	    console.log(transaction.splits);
+	    angular.forEach(transaction.splits, function(val, key) {
+		console.log(key, ":" , val);
+		trans_splits.push(key);
+		trans_splits.push(Number(val));
+	    });
+	};
 
 	$scope.thisIsIt = function(transaction,scope_elt) {
 	    return transaction == $scope[scope_elt].tran;

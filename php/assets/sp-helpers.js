@@ -94,7 +94,7 @@ angular.module('spHelpers',[])
 	    var splits = {};
 	    for (var idx = 0; idx < work_list.length; idx++) {
 		if (idx % 2) {
-		    splits[idx-1] = splits[idx];
+		    splits[work_list[idx-1]] = work_list[idx];
 		}
 	    }
 	    return splits;
