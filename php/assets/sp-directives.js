@@ -77,7 +77,7 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		+ '</td></tr>'
 		+ '<tr><td><input type="text" style="width:5em" ng-model="newSplit.cat"></td>'
 		+ '<td><input type="text" style="width:3em" ng-model="newSplit.amount">'
-		+ '<span ng-click="anything">+</span></td></tr>'
+		+ '<span ng-click="anything()">+</span></td></tr>'
 		+ '</table>\'></span>';
 
 	    return {
