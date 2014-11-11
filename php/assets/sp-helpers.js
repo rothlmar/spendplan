@@ -118,7 +118,7 @@ angular.module('spHelpers',[])
 	    category: transaction.get('Category'),
 	    acct: account.get('acctname'),
 	    currency: account.get('currency'),
-	    tags: getTags(transaction)
+	    tags: getTags(transaction),
 	    splits: getSplits(transaction)
 	};
 	// console.log(JSON.stringify(exp_trans.date));
