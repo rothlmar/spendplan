@@ -75,8 +75,8 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 	    var templ_str = '<span class="glyphicon glyphicon-list" data-content=\'<table class="table table-condensed"><tr><td>'
 		+ '{{ transaction.category }}</td><td>{{ transaction.amount }}'
 		+ '</td></tr>'
-		+'<tr><td><input type="text"></td><td><input type="text"> +</td></tr>'
-		+ '</table>\'';
+		+ '<tr><td><input type="text"></td><td><input type="text"> +</td></tr>'
+		+ '</table>\'></span>';
 
 	    return {
 		transclude: true,
