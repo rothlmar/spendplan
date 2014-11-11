@@ -88,6 +88,18 @@ angular.module('spHelpers',[])
 	    return ret_list;
 	};
 
+	var getSplits = function(transaction) {
+	    var split_list = transaction.getOrCreateList('Splits');
+	    var work_list = split_list.toArray();
+	    var splits = {};
+	    for (var idx = 0; idx < work_list.length; idx++) {
+		if (idx % 2) {
+		    splits[idx-1] = splits[idx];
+		}
+	    }
+	    return splits;
+	};
+
 	var currSymbol = function(trigraph) {
 	    if (trigraph == 'USD') {
 		return '$';
@@ -107,7 +119,7 @@ angular.module('spHelpers',[])
 	    acct: account.get('acctname'),
 	    currency: account.get('currency'),
 	    tags: getTags(transaction)
-	    // splits: getSplit(transaction)
+	    splits: getSplits(transaction)
 	};
 	// console.log(JSON.stringify(exp_trans.date));
 	exp_trans.currency_symbol = currSymbol(exp_trans.currency);

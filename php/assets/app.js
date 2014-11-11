@@ -9,7 +9,7 @@ var app = angular.module(
 
 app.controller(
     'SpendPlanCtrl', 
-    function SpendPlanCtrl($scope, $timeout, $http, 
+    function SpendPlanCtrl($scope, $timeout, $http, $rootScope,
 			   dropstoreClient, dictValFilter, orderByFilter, 
 			   transLimiter, updateExchangeRates, extractData) {
 	
