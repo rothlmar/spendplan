@@ -75,9 +75,12 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 	    return {
 		scope: true,
 		link: function(scope, element, attrs) {
-		    console.log(scope, attrs);
+		    var trans=scope.transaction;
+		    // console.log(scope, attrs);
 		    element.popover({title: "Splits", 
-				     html: true});
+				     html: true,
+				    content: scope.transaction.category + " "
+				     +scope.transaction.amount});
 		    
 
 		}
