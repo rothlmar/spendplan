@@ -69,31 +69,4 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		}
 		
 	    };
-	})
-    .directive(
-	'splitPopover', function() {
-	    var templ_str = '<span class="glyphicon glyphicon-list" data-content=\'<table class="table table-condensed"><tr><td>'
-		+ '{{ transaction.category }}</td><td>{{ transaction.amount }}'
-		+ '</td></tr>'
-		+ '<tr><td><input type="text" style="width:5em" ng-model="newSplit.cat"></td>'
-		+ '<td><input type="text" style="width:3em" ng-model="newSplit.amount">'
-		+ '<button ng-click="anyx()">+</buton></td></tr>'
-		+ '</table>\'></span>';
-
-	    return {
-		transclude: true,
-		scope: {
-		    anyx: '&anyfunc'
-		},
-		template: templ_str,
-		replace: true,
-		link: function(scope, element, attrs) {
-		    console.log(scope);
-		    // var trans=scope.transaction;
-		    // console.log(trans);
-		    // var content = 
-		    // console.log(scope, attrs);
-		    element.popover({html: true});
-		}
-	    }
-	})
+	});
