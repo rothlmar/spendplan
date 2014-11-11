@@ -80,14 +80,14 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 
 	    return {
 		transclude: true,
-		template: templ_str,
+		// template: templ_str,
 		link: function(scope, element, attrs) {
 		    // var trans=scope.transaction;
 		    // console.log(trans);
 		    // var content = 
 		    // console.log(scope, attrs);
 		    element.popover({html: true,
-				     content: content});
+				     content: templ_str});
 		}
 	    }
 	})
