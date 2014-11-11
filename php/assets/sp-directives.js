@@ -88,8 +88,7 @@ angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
 		    // console.log(trans);
 		    // var content = 
 		    // console.log(scope, attrs);
-		    element.popover({html: true,
-				     });
+		    element.popover({html: true});
 		}
 	    }
 	})
