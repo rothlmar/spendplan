@@ -62,6 +62,7 @@ app.controller(
 	$scope.edit_category = {tran: null, repl: ""};
 	$scope.edit_note = {tran: null, repl: ""};
 	$scope.edit_tags = {tran: null, repl: ""};
+	$scope.edit_splits = {tran: null, repl: ""};
 	
 
 	$scope.change_page = function(idx) {
@@ -392,6 +393,10 @@ app.controller(
 	    $scope.edit_tags.tags = "";
 	};
 	
+	$scope.showSplits = function(transaction) {
+	    $scope.edit_splits.tran = transaction;
+	}
+
 	$scope.thisIsIt = function(transaction,scope_elt) {
 	    return transaction == $scope[scope_elt].tran;
 	};

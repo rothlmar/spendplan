@@ -387,7 +387,19 @@
 		  </td>
 		</tr>
 		<tr ng-repeat-end>
-		  <td>Splits</td>
+		  <td>
+		    <span ng-click="showSplits(transaction)">Splits</span>
+		    <div ng-if="thisIsIt(transaction, 'edit_splits')">
+		      <table class="table table-condensed">
+			<tr>
+			  <td>abc</td><td>def</td>
+			</tr>
+			<tr>
+			  <td>abc</td><td>def</td>
+			</tr>
+		      </table>
+		    </div>
+		  </td>
 		  <td colspan="3"
 		      ng-class="{ editing: transaction == edit_note.tran }">
 		    <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
