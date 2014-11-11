@@ -394,7 +394,7 @@
 			<tr>
 			  <td>{{ transaction.category }}</td>
 			  <td>{{ transaction.amount | currency:transaction.currency_symbol }}</td>
-			<tr>
+			<tr ng-repeat="split in transaction.splits">
 			  <td>{{ split.category }}</td><td>{{ split.amount }}</td>
 			</tr>
 		      </table>

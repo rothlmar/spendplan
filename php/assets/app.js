@@ -396,7 +396,7 @@ app.controller(
 	$scope.showSplits = function(transaction) {
 	    if ($scope.edit_splits.tran == transaction) {
 		$scope.edit_splits.tran = null;
-		console.log(transaction.splits);
+		console.log("Splits are: ", transaction.splits);
 	    } else {
 		$scope.edit_splits.tran = transaction;
 	    }
