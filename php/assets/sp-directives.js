@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('spDirectives', ['dropstore-ng', 'ui.bootstrap'])
+angular.module('spDirectives', [])
     .directive(
 	'fileChooser', function($timeout) {
 	    return {

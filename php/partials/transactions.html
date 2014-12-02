@@ -1,0 +1,274 @@
+<div class="row">
+  <div class="col-md-2 col-md-push-10">
+    <h2>Filters</h2>
+    <form name="filterForm">
+      <h5>Date Range</h5>
+      <div class="input-group">
+	<input type="text"
+	       class="form-control"
+	       placeholder="From"
+	       datepicker-popup="MM/dd/yyyy"
+	       ng-model="trans_filter.date_min" 
+	       is-open="trans_filter.startOpened"
+	       />
+	<span class="input-group-btn">
+	  <button type="button" class="btn btn-default" 
+		  ng-click="open($event,trans_filter,'startOpened')">
+	    <i class="glyphicon glyphicon-calendar"></i>
+	  </button>
+	</span>
+      </div>
+      <div class="input-group">
+	<input type="text"
+	       class="form-control"
+	       placeholder="To"
+	       datepicker-popup="MM/dd/yyyy"
+	       ng-model="trans_filter.date_max" 
+	       is-open="trans_filter.endOpened"
+	       />
+	<span class="input-group-btn">
+	  <button type="button" class="btn btn-default" 
+		  ng-click="open($event,trans_filter,'endOpened')">
+	    <i class="glyphicon glyphicon-calendar"></i>
+	  </button>
+	</span>
+      </div>
+      <h5>Amount</h5>
+      <input type="text"
+	     style="width:4em"
+	     ng-model="trans_filter.amount_min"
+	     placeholder="min">
+      -
+      <input type="text"
+	     style="width:4em"
+	     ng-model="trans_filter.amount_max"
+	     placeholder="max">
+      <h5>Category</h5>
+      <input type="text"
+	     ng-model="trans_filter.category">
+      <h5>Account</h5>
+      <input type="text"
+	     ng-model="trans_filter.account" >
+      <h5>Tags</h5>
+      <input type="text"
+	     ng-model="trans_filter.tags">
+      <h5>Note</h5>
+      <input type="text"
+	     ng-model="trans_filter.note">
+    </form>
+    <ul class="pager">
+      <li>
+	<a ng-click="change_page(-1)"
+	   ng-hide="pager.page_num == 1">
+	  &larr;
+	</a>
+      </li>
+      <li>{{ pager.page_num }} of {{ pager.num_pages }}</li>
+      <li>
+	<a ng-click="change_page(1)"
+	   ng-hide="pager.page_num == pager.num_pages">
+	  &rarr;
+	</a>
+      </li>
+    </ul>
+    <!-- {{ trans_filter | json }} -->
+  </div>
+  
+  <div class="col-md-10 col-md-pull-2">
+    <div style="float:right">
+      <span db-chooser></span>
+      <span file-chooser></span>
+    </div>
+    <h2>Transactions</h2>
+    <table class="table table-responsive table-condensed" id="trans-table">
+      <tbody>
+	<tr style="background-color:rgba(200,220,255,0.3)">
+	  <td>
+	    <input type="date"
+		   style="width:8em"
+	  	   placeholder="MM/DD/YYYY"
+	  	   ng-model="newTrans.date">
+	  </td>
+	  <td>
+	    <input type="text"
+		   style="width:4em"
+	  	   placeholder="XX.XX"
+	  	   ng-model="newTrans.amount">
+	  </td>
+	  <td>
+	    <input type="text"
+		   style="width:7em"
+	  	   placeholder="Category"
+	  	   ng-model="newTrans.category">
+	  </td>
+	  <td>
+	    <input type="text"
+	  	   placeholder="Tags"
+	  	   style="width:15em"
+	  	   ng-model="newTrans.tags">
+	  </td>
+	  <td>
+	    <select ng-model="newTrans.account"
+	  	    ng-options="a.name + ' (' + a.currency + ')' for a in accounts">
+	    </select>
+	  </td>
+	  <td>
+	    <span ng-click="addTransaction()" class="glyphicon glyphicon-plus"></span>
+	  </td>
+	</tr>
+	<tr style="background-color:rgba(200,220,255,0.3)">
+	  <td colspan="2">
+	    <strong>Add New</strong>
+	  </td>
+	  <td colspan="4">
+	    <input type="text"
+	  	   style="width:45em"
+	  	   placeholder="Note"
+	  	   ng-model="newTrans.note">
+	  </td>
+	</tr>
+	
+	<tr ng-repeat-start="transaction in filteredTransactions" >
+	  <td rowspan="2">{{ transaction.date | date:'shortDate' }}</td>
+	  <td rowspan="2" class="{{ transaction.color }}">
+	    {{ transaction.amount | currency:transaction.currency_symbol }}
+	    <span ng-if="transaction.currency == 'GBP'">
+	      <br>{{ transaction.dollar_amount | currency }}
+	    </span>
+	  </td>
+	  <td ng-class="{ editing: transaction == edit_category.tran }">
+	    <span class="view" 
+		  ng-dblclick="startEdit(transaction,'edit_category')">
+	      {{ transaction.category | empty }}
+	    </span>
+	    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
+	      <input type="text" 
+		     ng-model="edit_category.repl" 
+		     ng-blur="editCategory(transaction)">
+	    </span>
+	  </td>
+	  <td ng-class="{ editing: transaction == edit_tags.tran }"
+	      ng-dblclick="startEdit(transaction,'edit_tags')">
+	    <strong>Tags</strong>:
+	    <span ng-repeat="tag in transaction.tags"
+	      	  class="view">
+	      <span class="label label-default">{{ tag }}</span>
+	    </span>
+	    <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
+	      <input type="text"
+	      	     ng-model="edit_tags.repl"
+	      	     ng-blur="editTags(transaction)">
+	    </span>
+	  </td>
+	  <td>{{ transaction.acct }}
+	    ({{ transaction.currency }})</td>
+	  <td>
+	    <span class="glyphicon glyphicon-remove"
+		  ng-click="transaction.trans.deleteRecord()">
+	    </span>
+	  </td>
+	</tr>
+	<tr ng-repeat-end>
+	  <td>
+	    <span class="label label-primary"
+		  ng-click="showSplits(transaction)">
+	      Splits
+	    </span>
+	    <div ng-if="thisIsIt(transaction, 'edit_splits')">
+	      <table class="table table-condensed">
+		<tr>
+		  <td>{{ transaction.category }}</td>
+		  <td>{{ mainAmount(transaction) | currency:transaction.currency_symbol }}</td>
+		<tr ng-repeat="(cat, amt) in transaction.splits">
+		  <td>{{ cat }}</td>
+		  <td>{{ amt | currency:transaction.currency_symbol }}</td>
+		  <td><span ng-click="removeSplit(transaction, cat)">-</span>
+		</tr>
+		<tr>
+		  <td>
+		    <input type="text" style="width:5em;"
+			   ng-model="edit_splits.add_cat">
+		  </td>
+		  <td>
+		    <input type="text" style="width:3em;"
+			   ng-model="edit_splits.add_amt">
+		  </td>
+		  <td>
+		    <span ng-click="addSplit(transaction)">+</span>
+		  </td>
+		</tr>
+		<tr>
+		  <td colspan="2"></td>
+		  <td>
+		    <button class="btn btn-default btn-xs"
+			    ng-click="saveSplits(transaction)">
+		      <span class="glyphicon glyphicon-save"></span>
+		    </button>
+		  </td>
+		</tr>
+	      </table>
+	    </div>
+	  </td>
+	  <td colspan="3"
+	      ng-class="{ editing: transaction == edit_note.tran }">
+	    <span class="view" ng-dblclick="startEdit(transaction,'edit_note')">
+	      <strong>For</strong>: {{ transaction.note | empty }}
+	    </span>
+	    <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
+	      <input type="text" 
+		     ng-model="edit_note.repl" 
+		     ng-blur="editNote(transaction)">
+	    </span>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+  </div> <!-- col-md-10 -->
+</div> <!-- row -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="importModalLabel">Import</h4>
+      </div>
+      <div class="modal-body" style="max-height:600px;overflow:auto">
+	<div>
+	  Account: <select ng-model="newTransactions.account"
+	  		   ng-options="a.name + ' (' + a.currency + ')' for a in accounts">
+	  </select>
+	</div>
+	<div>
+	  Date Format: <input type="text" ng-model="newTransactions.date_fmt">
+	</div>
+	<div>
+	  Invert Amounts? <input type="checkbox" 
+				 ng-model="newTransactions.debits_negative"
+				 ng-true-value="-1"
+				 ng-false-value="1" >
+	</div>
+	<table class="table table-condensed"> 
+	  <tr>
+	    <td><!-- Placeholder for delete in rows--></td>
+	    <td ng-repeat="c in newTransactions.cols track by $index">
+	      <select ng-model="newTransactions.cols[$index]"
+		      ng-options="c_hdr for c_hdr in column_headers">
+	      </select>
+	    </td>
+	  </tr>
+	  <tr ng-repeat="t in newTransactions.data track by $index">
+	    <td>
+	      <span class="glyphicon glyphicon-remove"
+		    ng-click="newTransactions.data.splice($index,1)">
+	    </td>
+	    <td ng-repeat="x in t track by $index">{{ x }}</td>
+	  </tr>
+	</table>
+	<button class="btn btn-primary"
+		ng-click="saveIt()">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>

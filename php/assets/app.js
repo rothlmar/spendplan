@@ -2,22 +2,41 @@
 
 var app = angular.module(
     'spendPlan',
-    ['dropstore-ng','ui.bootstrap','spDirectives', 'spFilters','spHelpers'])
-    .config(function (datepickerConfig) {
-	datepickerConfig.showWeeks = false;
-    });
+    ['ngRoute', 'dropstore-ng','ui.bootstrap','spDirectives', 'spFilters','spHelpers','spServices'])
+    .config(
+	['$routeProvider', 'datepickerConfig', 
+	 function ($routeProvider, datepickerConfig) {
+	     datepickerConfig.showWeeks = false;
+	     $routeProvider.when('/transactions', {
+		 templateUrl: 'partials/transactions.html',
+		 controller: 'SpendPlanCtrl'
+	     })
+	     .when('/accounts', {
+		 templateUrl: 'partials/accounts.html',
+		 controller: 'SpendPlanCtrl'
+	     })
+	     .when('/categories', {
+		 templateUrl: 'partials/categories.html',
+		 controller: 'SpendPlanCtrl'
+	     })
+	     .when('/tags', {
+		 templateUrl: 'partials/tags.html',
+		 controller: 'SpendPlanCtrl'
+	     })
+	     .otherwise({
+		 redirectTo: '/transactions'
+	     });
+
+	 }]);
 
 app.controller(
     'SpendPlanCtrl', 
     function SpendPlanCtrl($scope, $timeout, $http, $rootScope,
-			   dropstoreClient, dictValFilter, orderByFilter, 
-			   transLimiter, updateExchangeRates, extractData) {
+			   dictValFilter, orderByFilter, 
+			   transLimiter, spRecordService) {
 	
-	var _datastore = null;
-	var _accountTable = null;
-	var _transactionTable = null;
-	var _exchangeTable = null;
-	var latest_date = new Date(0);
+	// console.log(JSON.stringify(spRecordService));
+
 
 	// for adding stuff
 	$scope.newAcct = {name:'', curr:'USD'};
@@ -35,12 +54,12 @@ app.controller(
 	};
 	$scope.newSplit = {amount: 0, cat: ''}
 	// data holders
-	$scope.accounts = [];
-	$scope.transactions = {};
+	$scope.accounts = []; // spRecordService.accounts;
+	$scope.transactions = spRecordService.transactions;
 	$scope.filteredTransactions = [];
-	$scope.categories = {};
+	$scope.categories = []; // spRecordService.getCatBalances();
 	$scope.plan_categories = {}; // not used yet
-	$scope.tags = {};
+	$scope.tags = []; //spRecordService.tags;
 	$scope.exchangeRates = {};
 	// filters
 	$scope.acctDate = {date:''};
@@ -69,24 +88,24 @@ app.controller(
 	    $scope.pager.page_num += idx;
 	    $scope.filteredTransactions = 
 		orderByFilter(
-		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
+		    dictValFilter(spRecordService.transactions,
+				  transLimiter,
+				  $scope.trans_filter),
 		    'date',true)
 		.slice(($scope.pager.page_num-1)*100, 
 		       $scope.pager.page_num*100);
 	};
 
 	$scope.$watchCollection('catDate', function(newvals, oldvals) {
-	    $scope.categories = getCatBalances();
+	    $scope.categories = spRecordService.getCatBalances($scope.catDate);
 	});
 
 	$scope.$watchCollection('acctDate', function(newvals, oldvals) {
-	    angular.forEach($scope.accounts, function(acct) {
-		acct.balance = getBalance(acct.acct);
-	    });
+	    $scope.accounts = spRecordService.getAcctBalances($scope.acctDate.date);
 	});
 
 	$scope.$watchCollection('tagDate', function(newvals, oldvals) {
-	    $scope.tags = getTagBalances();
+	    $scope.tags = spRecordService.getTagBalances($scope.tagDate);
 	});
 
 	var filterTimeout;
@@ -96,13 +115,16 @@ app.controller(
 		$timeout.cancel(filterTimeout);
 	    };
 	    filterTimeout = $timeout(function() {
-	    var tempFiltTrans = orderByFilter(
-		dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
-		'date',true);
-	    $scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
-	    $scope.filteredTransactions = tempFiltTrans
-		.slice(($scope.pager.page_num-1)*100, 
-		       $scope.pager.page_num*100);
+		var tempFiltTrans = orderByFilter(
+		    dictValFilter(spRecordService.transactions,transLimiter,$scope.trans_filter),
+		    'date',true);
+		$scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
+		$scope.filteredTransactions = tempFiltTrans
+		    .slice(($scope.pager.page_num-1)*100, 
+			   $scope.pager.page_num*100);
+		$scope.accounts = spRecordService.getAcctBalances();
+		$scope.categories = spRecordService.getCatBalances();
+		$scope.tags = spRecordService.getTagBalances();
 	    }, 500);
 	});
 
@@ -112,9 +134,11 @@ app.controller(
 	    };
 	    filterTimeout = $timeout(function() {
 		$scope.pager.page_num = 1;
-		console.log('here we go');
+		// console.log('here we go');
 		var tempFiltTrans = orderByFilter(
-		    dictValFilter($scope.transactions,transLimiter,$scope.trans_filter),
+		    dictValFilter(spRecordService.transactions,
+				  transLimiter,
+				  $scope.trans_filter),
 		    'date',
 		    true);
 		$scope.pager.num_pages = Math.ceil(tempFiltTrans.length/100);
@@ -134,191 +158,6 @@ app.controller(
 	    dateOpts[opener] = true;
 	};
 
-	// var dropox_owner_name = '';
-	dropstoreClient.create({key: "i86ppgkz7etf1vk"})
-	    .authenticate({interactive: true})
-	    .then(function(datastoreManager) {
-		// console.log('completed authentication');
-		// dropstoreClient.getAccountInfo({}, function(error, acctinfo, acct_json) {
-		//     dropbox_owner_name = acctinfo.name;
-		//     console.log(dropbox_owner_name);
-		// });
-		return datastoreManager.openDefaultDatastore();
-	    })
-	    .then(function(datastore) {
-		var extractAcct = function(account) {
-		    return {
-			acct: account,
-			name: account.get('acctname'),
-			currency: account.get('currency'),
-			currency_symbol: currSymbol(account.get('currency')),
-			balance: getBalance(account)
-		    };
-		};
-		
-		_datastore = datastore;
-		
-		_transactionTable = _datastore.getTable('transactions');
-		_accountTable = _datastore.getTable('accounts');
-
-		$scope.acctTable = _accountTable;
-		var temp_accounts = _accountTable.query();
-		for (var ndx in temp_accounts) {
-		    $scope.accounts.push(extractAcct(temp_accounts[ndx]));
-		};
-		$scope.newTrans.account = $scope.accounts[0];
-		
-		_datastore.SubscribeRecordsChanged(function(records) {
-		    for (var ndx in records ){
-			$scope.accounts.push(extractAcct(records[ndx]));
-		    }
-		}, 'accounts');
-		
-		_exchangeTable = _datastore.getTable('exchange_rates')
-		var temp_rates = _exchangeTable.query();
-		for (var ndx in temp_rates) {
-		    var rate_date = temp_rates[ndx].get('date');
-		    // rate_date.setHours(0,0,0,0);
-		    // console.log(JSON.stringify(rate_date));
-		    if (rate_date > latest_date) {
-			latest_date = rate_date;
-		    };
-		    $scope.exchangeRates[rate_date] = temp_rates[ndx].get('rate');
-		};
-		_datastore.SubscribeRecordsChanged(function(records) {
-		    for (var ndx in records ){
-			var rate_date = records[ndx].get('date');
-			// rate_date.setHours(0,0,0,0);
-			if (rate_date > latest_date) {
-			    latest_date = rate_date;
-			};
-			$scope.exchangeRates[rate_date] = records[ndx].get('rate');
-		    }
-		}, 'exchange_rates');
-		
-		// console.log(JSON.stringify(latest_date));
-		// first time: grab exchange rates previously stored
-		$http({method: 'GET', url: '/rates.json'}).
-		    success(function(data, status, headers, config) {
-			var last_date = latest_date;
-			angular.forEach(data, function(value,ndx) { 
-			    var val_date = new Date(value['date']);
-			    val_date = new Date(Date.UTC(val_date.getFullYear(),
-						     val_date.getMonth(),
-						     val_date.getDate()));
-			    if (val_date.getTime() > last_date.getTime()) {
-				// console.log("found date: ", JSON.stringify(val_date));
-    				_exchangeTable.insert({
-    				    date: val_date,
-    				    rate: value['rate']
-    				});
-				if (val_date.getTime() > latest_date.getTime()) {
-				    latest_date = val_date;
-				};
-			    } else {
-				// console.log(JSON.stringify(val_date),
-				// 	       JSON.stringify(last_date),
-				// 	       JSON.stringify(latest_date))
-			    };
-			});
-			console.log("Latest date with known exchange rate: " + JSON.stringify(latest_date));
-			updateExchangeRates(latest_date,_exchangeTable);
-		    });
-		
-	
-		angular.forEach(_transactionTable.query(), function(record) {
-		    $scope.transactions[record.getId()] = 
-			extractData(record,
-				    $scope.acctTable.get(record.get('Account')),
-				    $scope.exchangeRates[record.get('Date')]);
-		});
-		
-		$scope.categories = getCatBalances();
-		$scope.tags = getTagBalances();
-
-		_datastore.SubscribeRecordsChanged(function(records) {
-		    angular.forEach(records, function(record) {
-			if (record.isDeleted()) {
-			    delete $scope.transactions[record.getId()];
-			} else {
-			    $scope.transactions[record.getId()] = extractData(record,
-				    $scope.acctTable.get(record.get('Account')),
-				    $scope.exchangeRates[record.get('Date')]);
-			};
-		    });
-		    angular.forEach($scope.accounts, function(acct) {
-			acct.balance = getBalance(acct.acct);
-		    });
-		    $scope.categories = getCatBalances();
-		    $scope.tags = getTagBalances();
-		}, 'transactions');
-	    });
-	
-	var getBalance = function(account) {
-	    var acct_date = new Date();
-	    if ($scope.acctDate.date != '') {
-		acct_date = new Date($scope.acctDate.date);
-	    }
-	    var acct_trans = _transactionTable.query({"Account": account.getId()});
-	    var total = 0.0;
-	    for (var ndx in acct_trans) {
-		var trans = acct_trans[ndx];
-		if (trans.get('Date') <= acct_date) {
-		    total += trans.get('Amount');
-		};
-	    }
-	    return total;
-	};
-	
-	var getCatBalances = function() {
-	    var start_date = new Date(0);
-	    var end_date = new Date();
-	    var categories = {};
-	    if ($scope.catDate.start != '') {
-		start_date = new Date($scope.catDate.start);
-	    };
-	    if ($scope.catDate.end != '') {
-		end_date = new Date($scope.catDate.end);
-	    };
-	    angular.forEach($scope.transactions, function(trans, ndx) {
-		if (trans.date >= start_date && trans.date <= end_date) {
-		    categories[trans.category] = (categories[trans.category] || 0) + trans.dollar_amount;
-		};
-	    });
-	    return categories;
-	};
-
-	var getTagBalances = function() {
-	    var tags = {};
-	    var start_date = new Date(0);
-	    var end_date = new Date();
-	    if ($scope.tagDate.start != '') {
-		start_date = new Date($scope.tagDate.start);
-	    };
-	    if ($scope.tagDate.end != '') {
-		end_date = new Date($scope.tagDate.end);
-	    };
-	    angular.forEach($scope.transactions, function(trans, ndx) {
-		if (trans.date >= start_date && trans.date <= end_date) {
-		    angular.forEach(trans.tags, function(value) {
-			tags[value] = (tags[value] || 0) + trans.dollar_amount;
-		    });
-		};
-	    });
-	    delete tags['None'];
-	    return tags;
-	}
-	
-	var currSymbol = function(trigraph) {
-	    if (trigraph == 'USD') {
-		return '$';
-	    } else if (trigraph == 'GBP') {
-		return '£';
-	    } else {
-		return "ERR";
-	    }
-	};
-	
 	$scope.addAccount = function() {
 	    _accountTable.insert({
 		acctname: $scope.newAcct.name,

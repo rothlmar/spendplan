@@ -8,19 +8,19 @@ angular.module('spHelpers',[])
     	var tag_pat = new RegExp(filt_obj.tags,'gi');
     	var min_test = true;
     	var max_test = true;
-    	if (filt_obj.amount_min != '') {
+    	if (filt_obj.amount_min && filt_obj.amount_min != '') {
     	    min_test = (transaction.amount >= Number(filt_obj.amount_min));
     	};
-    	if (filt_obj.amount_max != '') {
+    	if (filt_obj.amount_max && filt_obj.amount_max != '') {
     	    max_test = (transaction.amount <= Number(filt_obj.amount_max));
     	};
 	
     	var date_min = true;
     	var date_max = true;
-    	if (filt_obj.date_min != '') {
+    	if (filt_obj.date_min && filt_obj.date_min != '') {
     	    date_min = (transaction.date >= new Date(filt_obj.date_min));
     	};
-    	if (filt_obj.date_max != '') {
+    	if (filt_obj.date_max && filt_obj.date_max != '') {
     	    date_max = (transaction.date <= new Date(filt_obj.date_max));
     	};
     	var account_match = true;
@@ -117,6 +117,7 @@ angular.module('spHelpers',[])
 	    note: transaction.get('Note'),
 	    category: transaction.get('Category'),
 	    acct: account.get('acctname'),
+	    acct_id: account.getId(),
 	    currency: account.get('currency'),
 	    tags: getTags(transaction),
 	    splits: getSplits(transaction)
