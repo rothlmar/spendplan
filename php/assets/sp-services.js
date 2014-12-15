@@ -5,14 +5,18 @@ angular.module(
     ['dropstore-ng', 'spHelpers'])
     .factory(
 	'spRecordService', 
-	['$http', 'dropstoreClient', 'updateExchangeRates', 'extractData',
-	 function($http, dropstoreClient, updateExchangeRates, extractData) {
+	['$http', 'dropstoreClient', 'updateExchangeRates', 'extractData','dateFilter',
+	 function($http, dropstoreClient, updateExchangeRates, extractData, dateFilter) {
 	     var holder = {};
 	     var _datastore = null;
 	     var _accountTable = null;
 	     var _transactionTable = null;
 	     var _exchangeTable = null;
 	     var latest_date = new Date(0);
+
+	     holder.addTransaction = function(newTrans) {
+		 _transactionTable.insert(newTrans);
+	     };
 
 	     var currSymbol = function(trigraph) {
 		 if (trigraph == 'USD') {
@@ -42,6 +46,32 @@ angular.module(
 		 // console.log(to_return);
 		 // console.log(holder.accounts);
 	     	 return to_return;
+	     };
+
+	     var getMonthlySummary = function() {
+		 var monthlies = {};
+		 var monthlist = [];
+		 angular.forEach(holder.transactions, function(trans, ndx) {
+		     var anchor = new Date(trans.date.getFullYear(), trans.date.getMonth());
+		     var month = dateFilter(anchor, 'MMMM yyyy');
+		     if (!(anchor in monthlies)) {
+			 monthlies[anchor] = {month: month,
+					      anchor: anchor,
+					      amt_in: 0, 
+					      amt_out: 0};
+		     }
+		     if (trans.category.toLowerCase() != "transfer") {
+			 if (trans.amount > 0) {
+			     monthlies[anchor].amt_in += trans.dollar_amount;
+			 } else {
+			     monthlies[anchor].amt_out += trans.dollar_amount;
+			 }
+		     }
+		 });
+		 angular.forEach(monthlies, function(month, ndx) {
+		     monthlist.push(month);
+		 });
+		 return monthlist;
 	     };
 
 	     var getCatBalances = function(dates) {
@@ -86,6 +116,7 @@ angular.module(
 	     holder.getAcctBalances = getAcctBalances;
 	     holder.getCatBalances = getCatBalances;
 	     holder.getTagBalances = getTagBalances;
+	     holder.getMonthlySummary = getMonthlySummary;
 
 	     holder.newAcct = {name:'', curr:'USD'};
 	     holder.newTrans = 

@@ -1,0 +1,13 @@
+<div class="row">
+  <div class="col-sm-6 col-sm-offset-3">
+    <h2>Summary</h2>
+    <table class="table table-responsive table-striped">
+      <tr ng-repeat="month in monthly | orderBy:'anchor':true">
+	<td>{{ month.month | date:"shortDate" }}</td>
+	<td>{{ month.amt_in | currency }}</td>
+	<td>{{ month.amt_out | currency }}</td>
+	<td>{{ month.amt_in + month.amt_out | currency }}</td>
+      </tr>
+    </table>
+  </div>
+</div>

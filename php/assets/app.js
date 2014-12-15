@@ -23,8 +23,12 @@ var app = angular.module(
 		 templateUrl: 'partials/tags.html',
 		 controller: 'SpendPlanCtrl'
 	     })
+	     .when('/', {
+		 templateUrl: 'partials/summary.html',
+		 controller: 'SpendPlanCtrl'
+	     })
 	     .otherwise({
-		 redirectTo: '/transactions'
+		 redirectTo: '/'
 	     });
 
 	 }]);
@@ -125,6 +129,7 @@ app.controller(
 		$scope.accounts = spRecordService.getAcctBalances();
 		$scope.categories = spRecordService.getCatBalances();
 		$scope.tags = spRecordService.getTagBalances();
+		$scope.monthly = spRecordService.getMonthlySummary();
 	    }, 500);
 	});
 
@@ -174,7 +179,7 @@ app.controller(
 	    for (var ndx in tag_arr) {
 		tag_arr[ndx] = tag_arr[ndx].trim();
 	    };
-	    _transactionTable.insert({
+	    spRecordService.addTransaction({
 		Date: date,
 		Amount: Number($scope.newTrans.amount),
 		Category: $scope.newTrans.category,
@@ -316,7 +321,7 @@ app.controller(
 		for (var ndx in new_trans['Tags']) {
 		    new_trans['Tags'][ndx] = new_trans['Tags'][ndx].trim();
 		};
-		_transactionTable.insert(new_trans);
+		spRecordService.addTransaction(new_trans);
 	    });
 	    angular.element('#importModal').modal('hide');
 	};
