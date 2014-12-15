@@ -48,8 +48,12 @@
 	     typeahead="catname for catname in catnames | filter:$viewValue"
 	     ng-model="trans_filter.category">
       <h5>Account</h5>
-      <input type="text"
-	     ng-model="trans_filter.account" >
+      <select multiple
+	      ng-options="a.name + ' (' + a.currency + ')' for a in accounts"
+	      ng-model="trans_filter.account">
+      </select>
+      <!-- <input type="text" -->
+      <!-- 	     ng-model="trans_filter.account" > -->
       <h5>Tags</h5>
       <input type="text"
 	     ng-model="trans_filter.tags">
