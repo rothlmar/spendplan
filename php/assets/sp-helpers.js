@@ -4,7 +4,7 @@ angular.module('spHelpers',[])
     .value('transLimiter', function(transaction, filt_obj) {
     	var cat_pat = new RegExp(filt_obj.category,'gi');
     	var note_pat = new RegExp(filt_obj.note,'gi');
-    	var acct_pat = new RegExp(filt_obj.account,'gi');
+    	var acct_pat = new RegExp(filt_obj.account.join('|'),'gi');
     	var tag_pat = new RegExp(filt_obj.tags,'gi');
     	var min_test = true;
     	var max_test = true;
@@ -23,8 +23,8 @@ angular.module('spHelpers',[])
     	if (filt_obj.date_max && filt_obj.date_max != '') {
     	    date_max = (transaction.date <= new Date(filt_obj.date_max));
     	};
-    	var account_match = true;
     	var tag_match = true;
+    	// var account_combined = new RegExp(filt_obj.join('|'));
     	var tags_not_matched = 0;
     	angular.forEach(transaction.tags, function(tag) {
     	    if (!tag_pat.test(tag)) { 
