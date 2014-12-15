@@ -144,8 +144,8 @@ app.controller(
 	    };
 	    filterTimeout = $timeout(function() {
 		$scope.pager.page_num = 1;
-		console.log('here we go');
-		console.log($scope.trans_filter.account);
+		// console.log('here we go');
+		// console.log($scope.trans_filter.account);
 		var tempFiltTrans = orderByFilter(
 		    dictValFilter(spRecordService.transactions,
 				  transLimiter,
