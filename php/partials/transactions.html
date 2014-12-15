@@ -49,7 +49,7 @@
 	     ng-model="trans_filter.category">
       <h5>Account</h5>
       <select multiple
-	      ng-options="a.name + ' (' + a.currency + ')' for a in accounts"
+	      ng-options="a.name as a.name + ' (' + a.currency + ')' for a in accounts"
 	      ng-model="trans_filter.account">
       </select>
       <!-- <input type="text" -->
