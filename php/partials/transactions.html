@@ -45,6 +45,7 @@
 	     placeholder="max">
       <h5>Category</h5>
       <input type="text"
+	     typeahead="catname for catname in catnames"
 	     ng-model="trans_filter.category">
       <h5>Account</h5>
       <input type="text"

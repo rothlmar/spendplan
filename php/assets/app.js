@@ -61,7 +61,8 @@ app.controller(
 	$scope.accounts = []; // spRecordService.accounts;
 	$scope.transactions = spRecordService.transactions;
 	$scope.filteredTransactions = [];
-	$scope.categories = []; // spRecordService.getCatBalances();
+	$scope.categories = {}; // spRecordService.getCatBalances();
+	$scope.catnames = []; 
 	$scope.plan_categories = {}; // not used yet
 	$scope.tags = []; //spRecordService.tags;
 	$scope.exchangeRates = {};
@@ -128,6 +129,10 @@ app.controller(
 			   $scope.pager.page_num*100);
 		$scope.accounts = spRecordService.getAcctBalances();
 		$scope.categories = spRecordService.getCatBalances();
+		$scope.catnames = [];
+		angular.forEach($scope.categories, function(val,key) {
+		    $scope.catnames.push(key);
+		});
 		$scope.tags = spRecordService.getTagBalances();
 		$scope.monthly = spRecordService.getMonthlySummary();
 	    }, 500);

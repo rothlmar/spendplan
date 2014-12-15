@@ -14,9 +14,6 @@ angular.module(
 	     var _exchangeTable = null;
 	     var latest_date = new Date(0);
 
-	     holder.addTransaction = function(newTrans) {
-		 _transactionTable.insert(newTrans);
-	     };
 
 	     var currSymbol = function(trigraph) {
 		 if (trigraph == 'USD') {
@@ -28,7 +25,11 @@ angular.module(
 		 }
 	     };
 
-	     var getAcctBalances = function(acctDate) {
+	     holder.addTransaction = function(newTrans) {
+		 _transactionTable.insert(newTrans);
+	     };
+
+	     holder.getAcctBalances = function(acctDate) {
 	     	 var acct_date = new Date();
 	     	 if (acctDate && acctDate != '') {
 	     	     acct_date = new Date(acctDate);
@@ -48,7 +49,7 @@ angular.module(
 	     	 return to_return;
 	     };
 
-	     var getMonthlySummary = function() {
+	     holder.getMonthlySummary = function() {
 		 var monthlies = {};
 		 var monthlist = [];
 		 angular.forEach(holder.transactions, function(trans, ndx) {
@@ -74,7 +75,7 @@ angular.module(
 		 return monthlist;
 	     };
 
-	     var getCatBalances = function(dates) {
+	     holder.getCatBalances = function(dates) {
 		 var start_date = new Date(0);
 		 var end_date = new Date();
 		 var categories = {};
@@ -92,7 +93,7 @@ angular.module(
 		 return categories;
 	     };
 	     
-	     var getTagBalances = function(dates) {
+	     holder.getTagBalances = function(dates) {
 		 var tags = {};
 		 var start_date = new Date(0);
 		 var end_date = new Date();
@@ -113,11 +114,6 @@ angular.module(
 		 return tags;
 	     }
 	     
-	     holder.getAcctBalances = getAcctBalances;
-	     holder.getCatBalances = getCatBalances;
-	     holder.getTagBalances = getTagBalances;
-	     holder.getMonthlySummary = getMonthlySummary;
-
 	     holder.newAcct = {name:'', curr:'USD'};
 	     holder.newTrans = 
 		 {date: '', amount: '', category: '', note: '', account: '', tags: ''};
