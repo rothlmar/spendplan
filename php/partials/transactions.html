@@ -45,7 +45,7 @@
 	     placeholder="max">
       <h5>Category</h5>
       <input type="text"
-	     typeahead="catname for catname in catnames"
+	     typeahead="catname for catname in catnames | filter:$viewValue"
 	     ng-model="trans_filter.category">
       <h5>Account</h5>
       <input type="text"
@@ -100,6 +100,7 @@
 	    <input type="text"
 		   style="width:7em"
 	  	   placeholder="Category"
+		   typeahead="catname for catname in catnames | filter:$viewValue"
 	  	   ng-model="newTrans.category">
 	  </td>
 	  <td>
@@ -144,6 +145,7 @@
 	    </span>
 	    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
 	      <input type="text" 
+		     typeahead="catname for catname in catnames | filter:$viewValue"
 		     ng-model="edit_category.repl" 
 		     ng-blur="editCategory(transaction)">
 	    </span>
