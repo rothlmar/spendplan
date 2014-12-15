@@ -45,7 +45,7 @@ app.controller(
 	// for adding stuff
 	$scope.newAcct = {name:'', curr:'USD'};
 	$scope.newTrans = 
-	    {date: '', amount: '', category: '', note: '', account: [], tags: ''};
+	    {date: '', amount: '', category: '', note: '', account: '', tags: ''};
 	$scope.column_headers = 
 	    ['None', 'Date', 'Amount', 'Credit', 'Debit', 'Category', 'Note', 'Tags'];
 	$scope.newTransactions = {
@@ -77,7 +77,7 @@ app.controller(
 	     amount_max:'', 
 	     category:'', 
 	     note:'', 
-	     account:'', 
+	     account:[], 
 	     tags: ''};
 
 	$scope.pager = {page_num: 1, num_pages: 1 };
