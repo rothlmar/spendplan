@@ -59,10 +59,11 @@ angular.module(
 			 monthlies[anchor] = {month: month,
 					      anchor: anchor,
 					      amt_in: 0, 
-					      amt_out: 0};
+					      amt_out: 0
+					     };
 		     }
 		     if (trans.category.toLowerCase() != "transfer") {
-			 if (trans.amount > 0) {
+			 if (trans.dollar_amount > 0) {
 			     monthlies[anchor].amt_in += trans.dollar_amount;
 			 } else {
 			     monthlies[anchor].amt_out += trans.dollar_amount;

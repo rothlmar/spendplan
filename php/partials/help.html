@@ -1,0 +1,110 @@
+<div class="row">
+  <div class="col-md-6 col-md-offset-2">
+    <h2>Help</h2>
+    <div>
+      <h3>About SpendPlan</h3>
+      <p>
+	SpendPlan helps you keep track of your finances.  It's kind of like Mint, Quicken, 
+	Microsoft Money, your "Family Finances" spreadsheet, or your checkbook ledger, 
+	except SpendPlan is better.  SpendPlan uses your Dropbox account, which means:
+      </p>
+      <ol>
+	<li>
+	  Your records sync automatically and immediately between devices.
+	</li>
+	<li>
+	  Your records are private; you're the only person who has access to them&ndash;
+	  no advertisements.  (Technically speaking, Dropbox has access to your records.)
+	</li>
+      </ol>
+      <h3>How It Works</h3>
+      <ol>
+	<li>
+	  Add your accounts&ndash;bank accounts, credit cards, etc.  It's a
+	  good idea to make account names unique, so you don't get confused later on.
+	  Make sure to choose a currency for each account; US Dollars is the default, 
+	  but GB Pounds Sterling is also supported.  For GBP accounts, currency conversions 
+	  are shown using the end-of-day rate for the date of the transaction; when a transaction
+	  involves exchanging currency, this shows whether you got a good rate.  If you would like 
+	  support for additional currencies, please 
+	  <a href="mailto:rothlmar@gmail.com?subject=SpendPlan%20Currency%20Support">contact the developer</a>.
+	</li>
+	<li>
+	  Add transactions, just as they show up on your online banking or paper 
+	  account statement.  A category is required, e.g. <strong>Groceries</strong>, 
+	  <strong>Entertainment</strong>, or <strong>Travel</strong>. Tags are optional, 
+	  if you use them, they're usually more specific than a category, e.g. <em>Christmas</em> 
+	  or <em>Birthday</em> in the <strong>Gifts</strong> category.   You can add multiple 
+	  tags as comma-separated list.
+	</li>
+	<li>
+	  You can add transactions in bulk by uploading a CSV file.  Usually, this would be a file
+	  that you download or export from your bank or financial institution.  Click on the "Choose File"
+	  or "Upload from Dropbox" button, then follow your nose.
+	  <ul>
+	    <li>Select an account.</li>
+	    <li>Indicate the format for the date (e.g. mm/dd/yy is 07/04/1776).</li>
+	    <li>Choose column headers.  For some accounts, "Credit" and "Debit" will be listed in separate columns,
+	      but most accounts have both in the same column, so choose "Amount".  If debits show up as positive, as they
+	      might on a credit card, check the "Invert Amounts" box.  Finally, it's okay to select more than one column for "Note".
+	    </li>
+	    <li>Delete any superfluous rows, including column headers, by clicking the 
+	      <span class="glyphicon glyphicon-remove"></span> for that row.
+	    </li>
+	    <li>Click <a class="btn btn-primary btn-xs">Save</a>.  If you've made a mistake, nothing will happen, 
+	      so go back and check everything.
+	    </li>
+	  </ul>
+	</li>
+	<li>
+	  After you've added a transaction, you can change the category, tags, or description; just 
+	  double click on the thing you want to change.  The date, amount, and account can't be
+	  changed.  If you've made a mistake in one of those, delete the transaction and re-enter it.
+	</li>
+	<li>
+	  Filters help you gain insight into your past behavior.  The transaction filters can show
+	  you all of your transactions in a given category or at a given store (assuming you put that
+	  in the note), and the date filters under <strong>Categories</strong> show how
+	  much you earned spent over a specified time period.  The date filter in 
+	  <strong>Accounts</strong> will eventually show you your account balance on the selected
+	  date, but hasn't yet been set up.  Likewise with transaction filtering by tags.
+	</li>
+      </ol>
+      <h3>How It's Different</h3>
+      <ul>
+	<li>
+	  In SpendPlan there's no distinction between account types.  You can make your own 
+	  decisions about how to set things up, but I recommend that all expenditures be registered
+	  as negative numbers.  That's not how they look on your credit card statement, which
+	  is a sneaky trick the credit card companies use to make you think spending a lot of
+	  money is good!
+	</li>
+	<li>
+	  SpendPlan doesn't treat money transferred from one account to another specially.  When you 
+	  pay a credit card from your checking account, you have to enter two transactions; one as
+	  a debit, the other as a credit.
+	</li>
+      </ul>
+      <h2>Where It's Going</h2>
+      <ul>
+	<li>
+	  SpendPlan should live up to its promise of helping you plan your spending.  It isn't
+	  quite there yet.  I have a vision of being able to set goals or targets, which would
+	  be tied to tags and categories.  They could be ongoing, e.g. monthly grocery budget, or
+	  time-limited, e.g. this year's Christmas budget.  I haven't yet finalized my vision of
+	  how this will work; stay tuned.
+	</li>
+	<li>
+	  SpendPlan is in active development.  If you're reading this, you're an alpha tester, 
+	  so you know that some things don't work the way you expect, or at all. Please request 
+	  any features that would be helpful to you.
+	</li>
+      </ul>
+      
+      <div style="text-align:right">
+	<span class="glyphicon glyphicon-tower"></span>
+	<span class="glyphicon glyphicon-tree-deciduous"></span>
+      </div>
+    </div>
+  </div>
+</div>

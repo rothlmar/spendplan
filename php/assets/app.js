@@ -11,6 +11,9 @@ var app = angular.module(
 		 templateUrl: 'partials/transactions.html',
 		 controller: 'SpendPlanCtrl'
 	     })
+	     .when('/help' ,{
+		 templateUrl: 'partials/help.html'
+	     })
 	     .when('/accounts', {
 		 templateUrl: 'partials/accounts.html',
 		 controller: 'SpendPlanCtrl'
