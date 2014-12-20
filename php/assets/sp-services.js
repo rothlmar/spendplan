@@ -83,7 +83,7 @@ angular.module(
 			     } else {
 				 monthlies[anchor].amt_out += amt;
 			     }
-			 }
+			 })
 		     }
 		 });
 		 angular.forEach(monthlies, function(month, ndx) {
