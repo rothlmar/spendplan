@@ -7,6 +7,7 @@
 	<td>{{ month.amt_in | currency }}</td>
 	<td>{{ month.amt_out | currency }}</td>
 	<td>{{ month.amt_in + month.amt_out | currency }}</td>
+	<td>{{ month.cats | json }}</td>
       </tr>
     </table>
   </div>

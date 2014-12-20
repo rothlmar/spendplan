@@ -5,8 +5,10 @@ angular.module(
     ['dropstore-ng', 'spHelpers'])
     .factory(
 	'spRecordService', 
-	['$http', 'dropstoreClient', 'updateExchangeRates', 'extractData','dateFilter',
-	 function($http, dropstoreClient, updateExchangeRates, extractData, dateFilter) {
+	['$http', 'dropstoreClient', 'updateExchangeRates', 
+	 'extractData','dateFilter',
+	 function($http, dropstoreClient, updateExchangeRates, 
+		  extractData, dateFilter) {
 	     var holder = {};
 	     var _datastore = null;
 	     var _accountTable = null;
@@ -64,7 +66,8 @@ angular.module(
 		 var monthlies = {};
 		 var monthlist = [];
 		 angular.forEach(holder.transactions, function(trans, ndx) {
-		     var anchor = new Date(trans.date.getFullYear(), trans.date.getMonth());
+		     var anchor = new Date(trans.date.getFullYear(), 
+					   trans.date.getMonth());
 		     var month = dateFilter(anchor, 'MMMM yyyy');
 		     if (!(anchor in monthlies)) {
 			 monthlies[anchor] = {month: month,
@@ -82,6 +85,12 @@ angular.module(
 		     }
 		 });
 		 angular.forEach(monthlies, function(month, ndx) {
+		     month['cats'] = holder.getCatBalances({
+			 start: anchor,
+			 end: new Date(anchor.getFullYear(),
+				       anchor.getMonth() + 1,
+				       -1)
+		     });
 		     monthlist.push(month);
 		 });
 		 return monthlist;
