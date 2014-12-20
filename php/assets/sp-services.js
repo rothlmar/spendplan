@@ -86,9 +86,9 @@ angular.module(
 		 });
 		 angular.forEach(monthlies, function(month, ndx) {
 		     month['cats'] = holder.getCatBalances({
-			 start: anchor,
-			 end: new Date(anchor.getFullYear(),
-				       anchor.getMonth() + 1,
+			 start: month.anchor,
+			 end: new Date(month.anchor.getFullYear(),
+				       month.anchor.getMonth() + 1,
 				       -1)
 		     });
 		     monthlist.push(month);
