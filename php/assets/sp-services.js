@@ -76,15 +76,15 @@ angular.module(
 					      amt_out: 0
 					     };
 		     }
-		     if (trans.category.toLowerCase() != "transfer") {
-			 angular.forEach(splitify(trans), function(amt,cat) {
+		     angular.forEach(splitify(trans), function(amt,cat) {
+			 if (cat.toLowerCase() != "transfer") {
 			     if (amt > 0) {
 				 monthlies[anchor].amt_in += amt;
 			     } else {
 				 monthlies[anchor].amt_out += amt;
 			     }
-			 })
-		     }
+			 }
+		     })
 		 });
 		 angular.forEach(monthlies, function(month, ndx) {
 		     month['cats'] = holder.getCatBalances({
