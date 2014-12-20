@@ -24,7 +24,7 @@ angular.module('spFilters', [])
 	return function(input) {
 	    var ret_obj = {};
 	    angular.forEach(input, function(val,key) {
-		if (val > 500) {
+		if (Math.abs(val) > 500) {
 		    ret_obj[key] = val;
 		}
 	    });
