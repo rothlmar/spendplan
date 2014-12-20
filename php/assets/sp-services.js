@@ -25,6 +25,17 @@ angular.module(
 		 }
 	     };
 
+	     var splitify = function(t) {
+		 var cats = {};
+		 var main_amt = t.dollar_amount;
+		 angular.forEach(t.splits, function(val, cat) {
+		     main_amt -= val.dollar_amount;
+		     cats[cat] = val.dollar_amount;
+		 });
+		 cats[t.category] = main_amt;
+		 return cats;
+	     };
+
 	     holder.addTransaction = function(newTrans) {
 		 _transactionTable.insert(newTrans);
 	     };
@@ -88,7 +99,9 @@ angular.module(
 		 };
 		 angular.forEach(holder.transactions, function(trans, ndx) {
 		     if (trans.date >= start_date && trans.date <= end_date) {
-			 categories[trans.category] = (categories[trans.category] || 0) + trans.dollar_amount;
+			 angular.forEach(splitify(trans), function(amt, cat) {
+			     categories[cat] = (categories[cat] || 0) + amt;
+			 });
 		     };
 		 });
 		 return categories;

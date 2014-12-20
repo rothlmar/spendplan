@@ -136,7 +136,7 @@
 	
 	<tr ng-repeat-start="transaction in filteredTransactions" >
 	  <td rowspan="2">{{ transaction.date | date:'shortDate' }}</td>
-	  <td rowspan="2" class="{{ transaction.color }}">
+	  <td rowspan="2" ng-class="transaction.color">
 	    {{ transaction.amount | currency:transaction.currency_symbol }}
 	    <span ng-if="transaction.currency == 'GBP'">
 	      <br>{{ transaction.dollar_amount | currency }}
@@ -177,7 +177,7 @@
 	</tr>
 	<tr ng-repeat-end>
 	  <td>
-	    <span class="label label-primary"
+	    <span ng-class="splitStatus(transaction)"
 		  ng-click="showSplits(transaction)">
 	      Splits
 	    </span>
@@ -188,8 +188,13 @@
 		  <td>{{ mainAmount(transaction) | currency:transaction.currency_symbol }}</td>
 		<tr ng-repeat="(cat, amt) in transaction.splits">
 		  <td>{{ cat }}</td>
-		  <td>{{ amt | currency:transaction.currency_symbol }}</td>
-		  <td><span ng-click="removeSplit(transaction, cat)">-</span>
+		  <td>{{ amt.amount | currency:transaction.currency_symbol }}</td>
+		  <td>
+		    <button class="btn btn-default btn-xs"
+			    ng-click="removeSplit(transaction, cat)">
+		      <span class="glyphicon glyphicon-minus"></span>
+		    </button>
+		  </td>
 		</tr>
 		<tr>
 		  <td>
@@ -201,7 +206,10 @@
 			   ng-model="edit_splits.add_amt">
 		  </td>
 		  <td>
-		    <span ng-click="addSplit(transaction)">+</span>
+		    <button class="btn btn-default btn-xs"
+			    ng-click="addSplit(transaction)">
+		      <span class="glyphicon glyphicon-plus"></span>
+		    </button>
 		  </td>
 		</tr>
 		<tr>

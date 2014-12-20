@@ -91,10 +91,12 @@ angular.module('spHelpers',[])
 	var getSplits = function(transaction) {
 	    var split_list = transaction.getOrCreateList('Splits');
 	    var work_list = split_list.toArray();
+	    // console.log('GETTING SPLITS');
+	    // console.log(work_list);
 	    var splits = {};
 	    for (var idx = 0; idx < work_list.length; idx++) {
 		if (idx % 2) {
-		    splits[work_list[idx-1]] = work_list[idx];
+		    splits[work_list[idx-1]] = {amount: work_list[idx]};
 		}
 	    }
 	    return splits;
@@ -129,6 +131,9 @@ angular.module('spHelpers',[])
 	//     console.log('help me! ', JSON.stringify(exp_trans.date));
 	// }
 	exp_trans.dollar_amount = (exp_trans.currency == 'USD')?exp_trans.amount:exp_trans.amount/exch_rate;
+    	angular.forEach(exp_trans.splits, function(val, key) {
+	    val.dollar_amount = (exp_trans.currency == 'USD')?val.amount:val.amount/exch_rate;
+	})
 	return exp_trans;
     });
 
