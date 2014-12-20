@@ -77,10 +77,12 @@ angular.module(
 					     };
 		     }
 		     if (trans.category.toLowerCase() != "transfer") {
-			 if (trans.dollar_amount > 0) {
-			     monthlies[anchor].amt_in += trans.dollar_amount;
-			 } else {
-			     monthlies[anchor].amt_out += trans.dollar_amount;
+			 angular.forEach(splitify(trans), function(amt,cat) {
+			     if (amt > 0) {
+				 monthlies[anchor].amt_in += amt;
+			     } else {
+				 monthlies[anchor].amt_out += amt;
+			     }
 			 }
 		     }
 		 });
