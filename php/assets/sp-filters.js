@@ -20,4 +20,14 @@ angular.module('spFilters', [])
 	    };
 	    return ret_arr;
 	}
+    }).filter('spHighest', function() {
+	return function(input) {
+	    var ret_obj = {};
+	    angular.forEach(input, function(val,key) {
+		if (val > 500) {
+		    ret_obj[key] = val;
+		}
+	    });
+	    return ret_obj;
+	}
     });

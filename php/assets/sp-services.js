@@ -84,7 +84,7 @@ angular.module(
 				 monthlies[anchor].amt_out += amt;
 			     }
 			 }
-		     })
+		     });
 		 });
 		 angular.forEach(monthlies, function(month, ndx) {
 		     month['cats'] = holder.getCatBalances({
