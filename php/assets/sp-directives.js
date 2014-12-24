@@ -95,10 +95,9 @@ angular.module('spDirectives', [])
 			monthInfo: '=info'
 		    },
 		    link: function(scope, element, attrs) {
-			// element.html(scope.monthInfo.month);
 			var total = 0;
 			var progressCats = [];
-			angular.forEach(scope.monthInfo.cats, function(val, cat) {
+			angular.forEach(scope.monthInfo, function(val, cat) {
 			    if (val < 0  && cat.toLowerCase() !== 'transfer') {
 				progressCats.push([-val, cat]);
 				total -= val;
