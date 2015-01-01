@@ -76,10 +76,16 @@ angular.module(
 					      amt_out: 0
 					     };
 		     }
+		     // if (month == "July 2014") {
+		     // 	 console.log(JSON.stringify(splitify(trans)));
+		     // }
 		     angular.forEach(splitify(trans), function(amt,cat) {
 			 if (cat.toLowerCase() != "transfer") {
 			     if (amt > 0) {
 				 monthlies[anchor].amt_in += amt;
+				 // if (month == "July 2014") {
+				 //     console.log("IN STUFF: ", amt, cat, trans.date)
+				 // }
 			     } else {
 				 monthlies[anchor].amt_out += amt;
 			     }
@@ -91,7 +97,7 @@ angular.module(
 			 start: month.anchor,
 			 end: new Date(month.anchor.getFullYear(),
 				       month.anchor.getMonth() + 1,
-				       -1)
+				       0)
 		     });
 		     monthlist.push(month);
 		 });
@@ -107,11 +113,19 @@ angular.module(
 		 };
 		 if (dates && dates.end != '') {
 		     end_date = new Date(dates.end);
+		     end_date.setHours(23,59,59);
 		 };
+		 // console.log(start_date, end_date);
 		 angular.forEach(holder.transactions, function(trans, ndx) {
-		     if (trans.date >= start_date && trans.date <= end_date) {
+		     if (trans.date.valueOf() >= start_date.valueOf() && 
+			 trans.date.valueOf() <= end_date.valueOf()) {
 			 angular.forEach(splitify(trans), function(amt, cat) {
-			     categories[cat] = (categories[cat] || 0) + amt;
+			     categories[cat] = categories[cat] || {plus: 0, minus: 0};
+			     if (amt > 0) {
+				 categories[cat].plus += amt;
+			     } else {
+				 categories[cat].minus -= amt;
+			     }
 			 });
 		     };
 		 });

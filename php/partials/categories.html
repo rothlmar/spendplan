@@ -42,9 +42,17 @@
       </form>
     </div>
     <table class="table table-responsive table-striped table-condensed">
+      <tr>
+	<th>Category</th>
+	<th>Net</th>
+	<th>In</th>
+	<th>Out</th>
+      </tr>
       <tr ng-repeat="(category,balance) in categories ">
 	<td>{{ category }}</td>
-	<td>{{ balance | currency}}</td>
+	<td>{{ balance.plus - balance.minus | currency }}</td>
+	<td>{{ balance.plus | currency}}</td>
+	<td>{{ -balance.minus | currency}}</td>
       </tr>
     </table>
   </div>

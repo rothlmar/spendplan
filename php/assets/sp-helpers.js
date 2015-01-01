@@ -21,7 +21,9 @@ angular.module('spHelpers',[])
     	    date_min = (transaction.date >= new Date(filt_obj.date_min));
     	};
     	if (filt_obj.date_max && filt_obj.date_max != '') {
-    	    date_max = (transaction.date <= new Date(filt_obj.date_max));
+	    var filt_max_date = new Date(filt_obj.date_max);
+	    filt_max_date.setHours(23,59,59);
+    	    date_max = (transaction.date <= filt_max_date);
     	};
     	var tag_match = true;
     	// var account_combined = new RegExp(filt_obj.join('|'));

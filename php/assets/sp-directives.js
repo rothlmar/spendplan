@@ -1,4 +1,4 @@
-'use strict';
+'trause strict';
 
 angular.module('spDirectives', [])
     .directive(
@@ -92,34 +92,45 @@ angular.module('spDirectives', [])
 		    // template: '<span>HELLO!</span>',
 		    // replace: true,
 		    scope: {
-			monthInfo: '=info'
+			monthInfo: '=info',
+			plusminus: '@plusminus'
 		    },
 		    link: function(scope, element, attrs) {
 			var total = 0;
 			var progressCats = [];
+			// console.log(JSON.stringify(scope.monthInfo));
 			angular.forEach(scope.monthInfo, function(val, cat) {
-			    if (val < 0  && cat.toLowerCase() !== 'transfer') {
-				progressCats.push([-val, cat]);
-				total -= val;
-			    };
+			    if (scope.plusminus == '+') {
+				if (val.plus && cat.toLowerCase() !== 'transfer') {
+				    progressCats.push([val.plus, cat]);
+				    total += val.plus;
+				};
+			    } else {
+				if (val.minus  && cat.toLowerCase() !== 'transfer') {
+				    progressCats.push([val.minus, cat]);
+				    total += val.minus;
+				};
+			    }
 			});
 			progressCats.sort(function(a,b) {
 			    return b[0] - a[0];
 			});
-			// console.log(JSON.stringify(progressCats));
 			var progress = ''
-			angular.forEach(progressCats, function(cat, idx) {
+			angular.forEach(progressCats, function(cat) {
 			    var color = strHash(cat[1]);
-			    var width = '' + Math.ceil((cat[0]*100)/total);
+			    var width = ((cat[0]*100)/total).toFixed(3);
 			    var titleText = cat[1] + ' ($' + Math.round(cat[0]*100)/100 + ')';
-			    if (width >= 2) {
+			    // if (width >= 1) {
 				progress += '<div class="progress-bar" style="width: ' + 
 				    width + '%; background-color:' + color + '"' + 
 				    'data-toggle="tooltip"' +
 				    'title="' + titleText + '"' +
 				    '></div>';
-			    }
+			    // }
+			    cat[2] = width;
 			});
+			// console.log(JSON.stringify(progressCats));
+			console.log("TOTAL IS: " + total);
 			element.html(progress);
 			element.children().tooltip();
 		    }
