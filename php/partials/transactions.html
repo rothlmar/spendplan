@@ -45,8 +45,8 @@
 	     placeholder="max">
       <h5>Category</h5>
       <input type="text"
-	     typeahead="catname for catname in catnames | filter:$viewValue"
-	     ng-model="trans_filter.category">
+      	     typeahead="catname for catname in catnames | filter:$viewValue"
+      	     ng-model="trans_filter.category">
       <h5>Account</h5>
       <select multiple
 	      ng-options="a.name as a.name + ' (' + a.currency + ')' for a in accounts"
@@ -163,6 +163,7 @@
 	    </span>
 	    <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
 	      <input type="text"
+		     style="width:8em"
 	      	     ng-model="edit_tags.repl"
 	      	     ng-blur="editTags(transaction)">
 	    </span>
