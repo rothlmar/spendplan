@@ -149,7 +149,7 @@
 	    </span>
 	    <span class="edit" ng-if="thisIsIt(transaction,'edit_category')">
 	      <input type="text" 
-		     style="width:8em"
+		     style="width:6em"
 		     typeahead="catname for catname in catnames | filter:$viewValue"
 		     ng-model="edit_category.repl" 
 		     ng-blur="editCategory(transaction)">
