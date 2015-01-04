@@ -161,12 +161,14 @@
 	  </td>
 	  <td ng-class="{ editing: transaction == edit_tags.tran }"
 	      ng-dblclick="startEdit(transaction,'edit_tags')">
-	    <strong>Tags</strong>:
-	    <span ng-repeat="tag in transaction.tags"
-	      	  class="view">
-	      <span class="label label-default">{{ tag }}</span>
+	    <span class="view">
+	      <strong>Tags</strong>:
+	      <span ng-repeat="tag in transaction.tags">
+		<span class="label label-default">{{ tag }}</span>
+	      </span>
 	    </span>
 	    <span class="edit" ng-if="thisIsIt(transaction,'edit_tags')">
+	      <strong>Tags</strong>:
 	      <input type="text"
 	      	     ng-model="edit_tags.repl"
 	      	     ng-blur="editTags(transaction)">
@@ -235,6 +237,7 @@
 	      <strong>For</strong>: {{ transaction.note | empty }}
 	    </span>
 	    <span class="edit" ng-if="thisIsIt(transaction,'edit_note')">
+	      <strong>For</strong>:
 	      <input type="text" 
 		     ng-model="edit_note.repl" 
 		     ng-blur="editNote(transaction)">

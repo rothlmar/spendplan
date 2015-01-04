@@ -40,7 +40,7 @@ angular.module('spControllers',['spServices','spFilters','spHelpers','spDirectiv
 	$scope.catDate = {start: '', end: ''};
 	$scope.tagDate = {start: '', end: ''};
 	$scope.trans_filter = 
-	    {date_min:'', 
+	     {date_min:'', 
 	     date_max:'', 
 	     amount_min:'', 
 	     amount_max:'', 
@@ -49,6 +49,8 @@ angular.module('spControllers',['spServices','spFilters','spHelpers','spDirectiv
 	     account:[], 
 	     tags: ''};
 
+	$scope.selected = [];
+
 	$scope.pager = {page_num: 1, num_pages: 1 };
 
 	// editing which
@@ -56,7 +58,16 @@ angular.module('spControllers',['spServices','spFilters','spHelpers','spDirectiv
 	$scope.edit_note = {tran: null, repl: ""};
 	$scope.edit_tags = {tran: null, repl: ""};
 	$scope.edit_splits = {tran: null, repl: "", add_cat: "", add_amt: 0};
-	
+
+	$scope.reduceCats = function(cats, reduced) {
+	    var fewerCats = {};
+	    for (var key in cats) {
+	    	if (reduced.indexOf(key) > -1) {
+	    	    fewerCats[key] = cats[key];
+	    	};
+	    };
+	    return fewerCats;
+	};
 
 	$scope.change_page = function(idx) {
 	    $scope.pager.page_num += idx;
@@ -145,6 +156,8 @@ angular.module('spControllers',['spServices','spFilters','spHelpers','spDirectiv
 	    });
 	};
 	
+	 
+
 	$scope.addTransaction = function() {
 	    var date = new Date($scope.newTrans.date);
 	    date = new Date(Date.UTC(date.getFullYear(),

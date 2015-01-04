@@ -76,16 +76,10 @@ angular.module(
 					      amt_out: 0
 					     };
 		     }
-		     // if (month == "July 2014") {
-		     // 	 console.log(JSON.stringify(splitify(trans)));
-		     // }
 		     angular.forEach(splitify(trans), function(amt,cat) {
 			 if (cat.toLowerCase() != "transfer") {
 			     if (amt > 0) {
 				 monthlies[anchor].amt_in += amt;
-				 // if (month == "July 2014") {
-				 //     console.log("IN STUFF: ", amt, cat, trans.date)
-				 // }
 			     } else {
 				 monthlies[anchor].amt_out += amt;
 			     }

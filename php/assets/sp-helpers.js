@@ -4,7 +4,7 @@ angular.module('spHelpers',[])
     .value('transLimiter', function(transaction, filt_obj) {
     	var note_pat = new RegExp(filt_obj.note,'gi');
     	var tag_pat = new RegExp(filt_obj.tags,'gi');
-	// min_test and max_test don't respect splits....should they?
+	// min_test and max_test don't respect splits...should they?
     	var min_test = true;
     	var max_test = true;
     	if (filt_obj.amount_min && filt_obj.amount_min != '') {

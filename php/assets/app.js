@@ -23,6 +23,9 @@ var app = angular.module(
 	     .when('/tags', {
 		 templateUrl: 'partials/tags.html'
 	     })
+	     .when('/analysis', {
+		 templateUrl: 'partials/analysis.html'
+	     })
 	     .when('/', {
 		 templateUrl: 'partials/summary.html'
 	     })

@@ -89,50 +89,70 @@ angular.module('spDirectives', [])
 		};
 
 		return {
-		    // template: '<span>HELLO!</span>',
-		    // replace: true,
 		    scope: {
 			monthInfo: '=info',
+			reduceTo: '=reduceto',
 			plusminus: '@plusminus'
 		    },
 		    link: function(scope, element, attrs) {
-			var total = 0;
-			var progressCats = [];
-			// console.log(JSON.stringify(scope.monthInfo));
-			angular.forEach(scope.monthInfo, function(val, cat) {
-			    if (scope.plusminus == '+') {
-				if (val.plus && cat.toLowerCase() !== 'transfer') {
-				    progressCats.push([val.plus, cat]);
-				    total += val.plus;
-				};
+			var takeAction = function(reduceCats) {
+			    var total = 0;
+			    var subtotal = 0;
+			    var progressCats = [];
+			    var reducedCats = [];
+			    angular.forEach(scope.monthInfo, function(val, cat) {
+				if (scope.plusminus == '+') {
+				    if (val.plus && cat.toLowerCase() !== 'transfer') {
+					progressCats.push([val.plus, cat]);
+					total += val.plus;
+				    };
+				} else {
+				    if (val.minus  && cat.toLowerCase() !== 'transfer') {
+					progressCats.push([val.minus, cat]);
+					total += val.minus;
+				    };
+				}
+			    });
+			    progressCats.sort(function(a,b) {
+				return b[0] - a[0];
+			    });
+			    if (reduceCats && reduceCats.length > 0) {
+				// console.log("REDUCE CATS: " + JSON.stringify(reduceCats));
+			    	angular.forEach(progressCats, function(val, idx) {
+			    	    if (reduceCats.indexOf(val[1]) > -1) {
+			    		reducedCats.push(val);
+					subtotal += val[0];
+			    	    };
+			    	});
+				// console.log("REDUCTIFIED: " + JSON.stringify(reducedCats));
+				// console.log("SUBTOTAL: " + subtotal);
 			    } else {
-				if (val.minus  && cat.toLowerCase() !== 'transfer') {
-				    progressCats.push([val.minus, cat]);
-				    total += val.minus;
-				};
-			    }
-			});
-			progressCats.sort(function(a,b) {
-			    return b[0] - a[0];
-			});
-			var progress = ''
-			angular.forEach(progressCats, function(cat) {
-			    var color = strHash(cat[1]);
-			    var width = ((cat[0]*100)/total).toFixed(3);
-			    var titleText = cat[1] + ' ($' + Math.round(cat[0]*100)/100 + ')';
-			    // if (width >= 1) {
+			    	reducedCats = progressCats;
+			    };
+			    var progress = ''
+			    angular.forEach(reducedCats, function(cat) {
+				var color = strHash(cat[1]);
+				var width = ((cat[0]*100)/total).toFixed(4);
+				var titleText = cat[1] + ' ($' + Math.round(cat[0]*100)/100 + ')';
 				progress += '<div class="progress-bar" style="width: ' + 
 				    width + '%; background-color:' + color + '"' + 
 				    'data-toggle="tooltip"' +
 				    'title="' + titleText + '"' +
 				    '></div>';
-			    // }
-			    cat[2] = width;
+				// cat[2] = width;
+			    });
+			    // console.log("TOTAL IS: " + total);
+			    if (subtotal) {
+				progress += '<div>$' + subtotal.toFixed(2) + '</div>';
+			    };
+			    element.html(progress);
+			    element.children().tooltip();
+			};
+			takeAction();
+			scope.$watchCollection('reduceTo', function() {
+			    // console.log("reduce categories: " + JSON.stringify(scope.reduceTo));
+			    takeAction(scope.reduceTo);
 			});
-			// console.log(JSON.stringify(progressCats));
-			console.log("TOTAL IS: " + total);
-			element.html(progress);
-			element.children().tooltip();
 		    }
 		}
 	    });
