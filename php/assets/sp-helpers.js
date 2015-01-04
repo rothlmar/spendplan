@@ -2,10 +2,9 @@
 
 angular.module('spHelpers',[])
     .value('transLimiter', function(transaction, filt_obj) {
-    	var cat_pat = new RegExp(filt_obj.category,'gi');
     	var note_pat = new RegExp(filt_obj.note,'gi');
-    	var acct_pat = new RegExp(filt_obj.account.join('|'),'gi');
     	var tag_pat = new RegExp(filt_obj.tags,'gi');
+	// min_test and max_test don't respect splits....should they?
     	var min_test = true;
     	var max_test = true;
     	if (filt_obj.amount_min && filt_obj.amount_min != '') {
@@ -26,7 +25,6 @@ angular.module('spHelpers',[])
     	    date_max = (transaction.date <= filt_max_date);
     	};
     	var tag_match = true;
-    	// var account_combined = new RegExp(filt_obj.join('|'));
     	var tags_not_matched = 0;
     	angular.forEach(transaction.tags, function(tag) {
     	    if (!tag_pat.test(tag)) { 
@@ -37,10 +35,23 @@ angular.module('spHelpers',[])
     	if (tags_not_matched == transaction.tags.length) {
     	    tag_match = false;
     	};
+
+	var splitCats = function(t) {
+	    if (filt_obj.category.indexOf(t.category) > -1) {
+		return true;
+	    } else {
+		for (var cat in t.splits) {
+		    if (filt_obj.category.indexOf(cat) > -1) {
+			return true;
+		    }
+		}
+	    }
+	    return false;
+	};
 	
-    	return cat_pat.test(transaction.category) &&
+    	return (filt_obj.category.length == 0 || splitCats(transaction)) &&
     	    note_pat.test(transaction.note) &&
-    	    acct_pat.test(transaction.acct) &&
+	    (filt_obj.account.length == 0 || filt_obj.account.indexOf(transaction.acct) > -1) &&
     	    tag_match &&
     	    min_test && max_test &&
     	    date_min && date_max;

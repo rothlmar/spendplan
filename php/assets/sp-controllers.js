@@ -44,7 +44,7 @@ angular.module('spControllers',['spServices','spFilters','spHelpers','spDirectiv
 	     date_max:'', 
 	     amount_min:'', 
 	     amount_max:'', 
-	     category:'', 
+	     category:[], 
 	     note:'', 
 	     account:[], 
 	     tags: ''};
