@@ -1,0 +1,24 @@
+{
+  "name": "spfb",
+  "version": "0.0.1",
+  "description": "SpendPlan port to Firebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "angular": "^1.5.5",
+    "angular-animate": "^1.5.5",
+    "angular-aria": "^1.5.5",
+    "angular-material": "^1.0.7",
+    "angular-material-data-table": "^0.10.9",
+    "angular-messages": "^1.5.5",
+    "angularfire": "^1.2.0",
+    "firebase": "^2.4.2",
+    "lodash": "^4.11.2",
+    "moment": "^2.13.0",
+    "uglifyjs": "^2.4.10"
+  }
+}
