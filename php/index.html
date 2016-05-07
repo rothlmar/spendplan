@@ -98,23 +98,23 @@
 	  </md-tab>
 	  <md-tab label="Accounts">
 	    <md-content class="md-padding" layout="row" layout-align="center">
-	      <div layout="column" flex="100" flex-gt-lg="50">
+	      <div layout="column" flex="100" flex-gt-sm="50">
 		<md-table-container flex>
 		  <table md-table>
 		    <thead md-head>
 		      <tr md-row>
 			<th md-column>Account Name</th>
-			<th md-column>Currency</th>
+			<th md-column hide show-gt-sm>Currency</th>
 			<th md-column md-numeric>Balance</th>
-			<th md-column md-numeric>Last Transaction</th>
+			<th md-column hide show-gt-sm>Last Transaction</th>
 		      </tr>
 		    </thead>
 		    <tbody md-body>
 		      <tr ng-repeat="(k, a) in acctsf">
 			<td md-cell>{{ a.fire.name }}</td>
-			<td md-cell>{{ a.fire.currency }}</td>
+			<td md-cell hide show-gt-sm>{{ a.fire.currency }}</td>
 			<td md-cell>{{ balance(a.tx, acctDate) | currency:a.sym }}</td>
-			<td md-cell>{{ lastdate(a.tx) | date:'shortDate' }}</td>
+			<td md-cell hide show-gt-sm>{{ lastdate(a.tx) | date:'shortDate' }}</td>
 		      </tr>
 		    </tbody>
 		  </table>
