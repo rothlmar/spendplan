@@ -44,7 +44,7 @@
 		    <th md-column>Date</th>
 		    <th md-column>Amount</th>
 		    <th md-column>Category</th>
-		    <th md-column hide show-gt-sm>Note</th>
+		    <th md-column>Note</th>
 		    <th md-column>Tags</th>
 		    <th md-column>Account</th>
 		  </thead>
@@ -74,7 +74,6 @@
 			{{ t.fire.Category }}
 		      </td>
 		      <td md-cell
-			  hide show-gt-sm
 			  style="max-width:30em"
 			  ng-click="editNote($event, t)">
 			  {{ t.fire.Note }}
