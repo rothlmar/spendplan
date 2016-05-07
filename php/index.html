@@ -36,7 +36,7 @@
 	  </md-tab>
 	  <md-tab label="Transactions">
 	    <md-content class="md-padding" layout="row" layout-align="center">
-	      <div flex="90" layout="column">
+	      <div flex flex-gt-sm="90" layout="column">
 	      <md-table-container flex>
 		<!-- <table md-table md-row-select="true" ng-model="txSelected"> -->
 		<table md-table>
@@ -44,7 +44,7 @@
 		    <th md-column>Date</th>
 		    <th md-column>Amount</th>
 		    <th md-column>Category</th>
-		    <th md-column>Note</th>
+		    <th md-column hide show-gt-sm>Note</th>
 		    <th md-column>Tags</th>
 		    <th md-column>Account</th>
 		  </thead>
@@ -63,6 +63,7 @@
 			</div>
 		      </td>
 		      <td md-cell
+			  hide show-gt-sm
 			  style="min-width:8em">
 			<!-- <md-select ng-model="t.fire.Category" -->
 			<!-- 	   ng-change="tx.$save(t.fire)" -->
