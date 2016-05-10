@@ -1,0 +1,63 @@
+<div flex
+     flex-gt-sm="90"
+     layout="column"
+     ng-controller="txCtrl">
+  <md-table-container flex>
+    <!-- <table md-table md-row-select="true" ng-model="txSelected"> -->
+    <table md-table>
+      <thead md-head>
+	<th md-column>Date</th>
+	<th md-column>Amount</th>
+	<th md-column>Category</th>
+	<th md-column>Note</th>
+	<th md-column>Tags</th>
+	<th md-column>Account</th>
+      </thead>
+      <tbody md-body>
+	<tr md-row
+	    ng-repeat="t in txf | 
+		       orderBy:'-fire.Date' | 
+		       limitTo:txPage.limit:(txPage.num -1)*txPage.limit" >
+	  <!-- md-select="t" -->
+	  <!-- md-select-id="t.fire.$id"> -->
+	  <td md-cell>{{ t.fire.Date | date:'shortDate' }}</td>
+	  <td md-cell>
+	    <div ng-if="t.acct.currency !== 'USD'">
+	      {{ t.fire.Amount | currency:t.curSym}}
+	    </div>
+	    <div>
+	      {{ t.AmountUSD | currency}}
+	    </div>
+	  </td>
+	  <td md-cell
+	      style="min-width:8em">
+	    <!-- <md-select ng-model="t.fire.Category" -->
+	    <!-- 	   ng-change="tx.$save(t.fire)" -->
+	    <!-- 	   placeholder="Uncategorized"> -->
+	    <!--   <md-option ng-value="cat" ng-repeat="cat in categories | orderBy:'toString'"> -->
+	    <!--     {{ cat }} -->
+	    <!--   </md-option> -->
+	    <!-- </md-select>	    -->
+	    {{ t.fire.Category }}
+	  </td>
+	  <td md-cell
+	      style="max-width:30em"
+	      ng-click="editNote($event, t)">
+	    {{ t.fire.Note }}
+	  </td>
+	  <td md-cell
+	      style="min-width:10em">
+	    {{ t.fire.Tags.join(',')}}
+	  </td>
+	  <td md-cell>{{ t.acct.name }}</td>
+	</tr>
+      </tbody>
+    </table>
+  </md-table-container>
+  <md-table-pagination
+     md-page="txPage.num"
+     md-limit="txPage.limit"
+     md-total="{{ txf.length }}"
+     md-page-select="true">
+  </md-table-pagination>
+</div>

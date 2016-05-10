@@ -1,0 +1,32 @@
+<div layout="column"
+     flex="100"
+     flex-gt-sm="40"
+     ng-controller="ctCtrl">
+  <div flex>
+    From: 
+    <md-datepicker ng-model="startDate"
+		   md-placeholder="Start date">
+    </md-datepicker>
+    <br>
+    To: 
+    <md-datepicker ng-model="endDate"
+		   md-placeholder="End date">
+    </md-datepicker>
+  </div>
+  <md-table-container flex>
+    <table md-table>
+      <thead md-head>
+	<tr md-row>
+	  <th md-column>Category</th>
+	  <th md-column md-numeric>Amount</th>
+	</tr>
+      </thead>
+      <tbody md-body>
+	<tr ng-repeat="(cat, tx) in catf">
+	  <td md-cell>{{ cat }}</td>
+	  <td md-cell>{{ balance(tx, endDate, startDate, true) | currency }}</td>
+	</tr>
+      </tbody>
+    </table>
+  </md-table-container>
+</div>

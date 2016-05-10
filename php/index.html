@@ -29,103 +29,15 @@
       </div>
       <div ng-show="authData">
 	<md-tabs md-dynamic-height md-border-bottom>
-	  <md-tab label="Overview">
-	    <md-content class="md-padding">
-	      <p>Once I get the basics set, this will be awesome.</p>
-	    </md-content>
-	  </md-tab>
-	  <md-tab label="Transactions">
-	    <md-content class="md-padding" layout="row" layout-align="center">
-	      <div flex flex-gt-sm="90" layout="column">
-	      <md-table-container flex>
-		<!-- <table md-table md-row-select="true" ng-model="txSelected"> -->
-		<table md-table>
-		  <thead md-head>
-		    <th md-column>Date</th>
-		    <th md-column>Amount</th>
-		    <th md-column>Category</th>
-		    <th md-column>Note</th>
-		    <th md-column>Tags</th>
-		    <th md-column>Account</th>
-		  </thead>
-		  <tbody md-body>
-		    <tr md-row
-			ng-repeat="t in txf | orderBy:'-fire.Date' | limitTo:txPage.limit:(txPage.num -1)*txPage.limit" >
-		      <!-- md-select="t" -->
-		      <!-- md-select-id="t.fire.$id"> -->
-		      <td md-cell>{{ t.fire.Date | date:'shortDate' }}</td>
-		      <td md-cell>
-			<div ng-if="t.acct.currency !== 'USD'">
-			  {{ t.fire.Amount | currency:t.curSym}}
-			</div>
-			<div>
-			  {{ t.AmountUSD | currency}}
-			</div>
-		      </td>
-		      <td md-cell
-			  style="min-width:8em">
-			<!-- <md-select ng-model="t.fire.Category" -->
-			<!-- 	   ng-change="tx.$save(t.fire)" -->
-			<!-- 	   placeholder="Uncategorized"> -->
-			<!--   <md-option ng-value="cat" ng-repeat="cat in categories | orderBy:'toString'"> -->
-			<!--     {{ cat }} -->
-			<!--   </md-option> -->
-			<!-- </md-select>	    -->
-			{{ t.fire.Category }}
-		      </td>
-		      <td md-cell
-			  style="max-width:30em"
-			  ng-click="editNote($event, t)">
-			  {{ t.fire.Note }}
-		      </td>
-		      <td md-cell
-			  style="min-width:10em">
-			{{ t.fire.Tags.join(',')}}
-		      </td>
-		      <td md-cell>{{ t.acct.name }}</td>
-		    </tr>
-		  </tbody>
-		</table>
-	      </md-table-container>
-	      <md-table-pagination
-		 md-page="txPage.num"
-		 md-limit="txPage.limit"
-		 md-total="{{ txf.length }}"
-		 md-page-select="true">
-	      </md-table-pagination>
-	      </div>
-	    </md-content>
-	  </md-tab>
-	  <md-tab label="Accounts">
-	    <md-content class="md-padding" layout="row" layout-align="center">
-	      <div layout="column" flex="100" flex-gt-sm="50">
-		<md-table-container flex>
-		  <table md-table>
-		    <thead md-head>
-		      <tr md-row>
-			<th md-column>Account Name</th>
-			<th md-column md-numeric>Balance</th>
-			<th md-column hide show-gt-xs>Last Transaction</th>
-			<th md-column hide show-gt-sm>Currency</th>
-		      </tr>
-		    </thead>
-		    <tbody md-body>
-		      <tr ng-repeat="(k, a) in acctsf">
-			<td md-cell>{{ a.fire.name }}</td>
-			<td md-cell>{{ balance(a.tx, acctDate) | currency:a.sym }}</td>
-			<td md-cell hide show-gt-xs>{{ lastdate(a.tx) | date:'shortDate' }}</td>
-			<td md-cell hide show-gt-sm>{{ a.fire.currency }}</td>
-		      </tr>
-		    </tbody>
-		  </table>
-		</md-table-container>
-		<div flex>
-		  Balances as of: 
-		  <md-datepicker ng-model="acctDate"
-				 md-placeholder="Balance date">
-		  </md-datepicker>
-		</div>
-	      </div>
+	  <md-tab ng-repeat="tab in tabs"
+		  label="{{ tab.title }}">
+	    <md-content layout="row">
+	      <ng-include src="tab.content"
+			  class="md-padding"
+			  layout="row"
+			  layout-align="center"
+			  flex>
+	      </ng-include>
 	    </md-content>
 	  </md-tab>
 	</md-tabs>

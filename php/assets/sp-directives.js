@@ -1,4 +1,4 @@
-'trause strict';
+'use strict';
 
 angular.module('spDirectives', [])
     .directive(
