@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="assets/spfb/angular-material.min.css">
     <link rel="stylesheet" href="assets/spfb/md-data-table.min.css">
     <script src="bundle.js"></script>
+    <style>
+      .mymsg {
+      text-align: right;
+      }
+    </style>
+
   </head>
   
   <body ng-controller="MainCtrl">
@@ -25,7 +31,9 @@
 	  <label>Password</label>
 	  <input type="password" ng-model="creds.password">
 	</md-input-container>
-	<md-button class="md-raised md-primary" ng-click="login()">Login</md-button>
+	<md-button class="md-raised md-primary" ng-click="login()">
+	  Login
+	</md-button>
       </div>
       <div ng-show="authData">
 	<md-tabs md-dynamic-height md-border-bottom>

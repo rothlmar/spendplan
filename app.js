@@ -10,15 +10,27 @@ angular.module('spendPlan',
 	       ['firebase',
 		require('angular-material'),
 		require('angular-material-data-table')])
+  .config(function() {
+    var config = {
+      apiKey: 'AIzaSyCEbjBn1SapwDrseuleRd7seaWR8ph0_yc',
+      authDomain: 'spendplan.firebaseapp.com',
+      databaseURL: 'https://spendplan.firebaseio.com',
+      storageBucket: 'project-5474304953684604346.appspot.com'
+    };
+    firebase.initializeApp(config);
+  })
   .controller(
     'MainCtrl',
-    ['$scope','$firebaseObject','$firebaseAuth','$firebaseArray','$timeout',
-     function($scope, $firebaseObject, $firebaseAuth, $firebaseArray, $timeout) {
-       var baseurl = 'https://spendplan.firebaseio.com';
-       var ref = new Firebase(baseurl);
-       var acctRef = new Firebase(baseurl + '/accounts');
-       var rateRef = new Firebase(baseurl + '/rates');
-       var txRef = new Firebase(baseurl + '/tx');
+    ['$scope',
+     '$firebaseObject',
+     '$firebaseAuth',
+     '$firebaseArray',
+     '$timeout',
+     function($scope,
+	      $firebaseObject,
+	      $firebaseAuth,
+	      $firebaseArray,
+	      $timeout) {
        
        $scope.creds = {
        	 email: '',
@@ -31,14 +43,19 @@ angular.module('spendPlan',
 	 {title: 'Accounts', content: 'partials/accts.html'},
 	 {title: 'Categories', content: 'partials/cats.html'},
 	 {title: 'Tags', content: 'partials/tgs.html'},
-	 {title: 'Upload', content: 'partials/upload.html'}
+	 {title: 'Upload', content: 'partials/upload.html'},
+	 // {title: 'Text', content: 'partials/text.html'}
        ];
        
        $scope.authData = null;
-       var auth = $firebaseAuth(ref);
+       var auth = $firebaseAuth();
        $scope.authData = auth.$getAuth();
-       auth.$onAuth(function(authData) {
+       auth.$onAuthStateChanged(function(authData) {
 	 $scope.authData = authData;
+	 var ref = firebase.database().ref();
+	 var acctRef = firebase.database().ref('accounts');
+	 var rateRef = firebase.database().ref('rates');
+	 var txRef = firebase.database().ref('tx');
 	 $scope.acctsf = {};
 	 $scope.catf = {};
 	 $scope.tagf = {};
@@ -97,7 +114,8 @@ angular.module('spendPlan',
 	 $scope.txf = [];
 	 $scope.tx.$loaded().then(function(data) {
 	   angular.forEach(data, function(val) {
-	     var acct = $scope.accts[val.Account];
+	     var modAcct = val.Account.substring(1);
+	     var acct = $scope.accts[val.Account] || $scope.accts[modAcct];
 	     var rate = $scope.rates[val.Date];
 	     var newrec = {
 	       fire: val,
@@ -110,7 +128,7 @@ angular.module('spendPlan',
 	       newrec.AmountUSD = val.Amount;
 	       newrec.curSym = '$';
 	     }
-	     var sup = $scope.acctsf[val.Account];
+	     var sup = $scope.acctsf[val.Account] || $scope.acctsf[modAcct];
 	     sup.tx.push(newrec);
 	     var curcat = $scope.catf[val.Category] = $scope.catf[val.Category] || [];
 	     curcat.push(newrec);
@@ -125,7 +143,7 @@ angular.module('spendPlan',
        });
        
        $scope.login = function() {
-	 auth.$authWithPassword($scope.creds)
+	 auth.$signInWithEmailAndPassword($scope.creds.email,$scope.creds.password)
 	   .then(function(authData) {
 	     console.log('LOGIN SUCCESS');
 	   }).catch(function(error) {
@@ -140,14 +158,23 @@ angular.module('spendPlan',
      }])
   .controller(
     'txCtrl',
-    ['$scope','$mdEditDialog',
-     function($scope, $mdEditDialog) {
+    ['$scope', '$filter', '$mdEditDialog',
+     function($scope, $filter, $mdEditDialog) {
        $scope.txPage = {
 	 num: 1,
-	 limit: 50
+	 limit: 100
        };
        $scope.txSelected = [];
 
+       $scope.getCats = function(srch) {
+	 return $filter('filter')($scope.categories.sort(), srch);
+       };
+
+       $scope.editCat = function(t) {
+	 console.log("CATEGORY IS: " + t.fire.Category);
+	 $scope.tx.$save(t.fire);
+       };
+       
        $scope.editNote = function(event, t) {
 	 var editDialog = {
 	   modelValue: t.fire.Note,
@@ -191,6 +218,53 @@ angular.module('spendPlan',
     'tgCtrl',
     ['$scope',
      function($scope) {
+     }])
+  .controller(
+    'textCtrl',
+    ['$scope','$http','$httpParamSerializerJQLike',
+     function($scope, $http, $httpParamSerializerJQLike) {
+       $scope.item = {msgs: []};
+       var acctSid = 'AC12413265d6f17562b32fd3231ff4240e';
+       var authTkn = '14865107f40af6b3629641cd87fda1a2';
+       $scope.mynum = '+447481340534';
+
+       var getMsgs = function() {
+	 $http({
+	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
+	   method: 'GET',
+	   params: {PageSize: 100},
+	   headers: {
+	     'Content-Type': 'application/x-www-form-urlencoded',
+	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
+	   }
+	 }).then(function(rsp) {
+	   $scope.item.msgs = rsp.data.messages;
+	   angular.forEach(rsp.data.messages, function(val) {
+	     val.timestamp = moment(new Date(val.date_sent));
+	   });
+	 });
+       }
+       
+       getMsgs();
+
+       $scope.transmit = function(m) {
+	 var data = {
+	   'To': '+447456963812',
+	   'From': '+447481340534',
+	   'Body': m
+	 }
+	 $http({
+	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
+	   method: 'POST',
+	   data: $httpParamSerializerJQLike(data),
+	   headers: {
+	     'Content-Type': 'application/x-www-form-urlencoded',
+	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
+	   }
+	 }).then(function(rsp) {
+	   getMsgs()
+	 });
+       };
      }])
   .controller(
     'upCtrl',

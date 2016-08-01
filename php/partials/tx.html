@@ -38,7 +38,19 @@
 	    <!--     {{ cat }} -->
 	    <!--   </md-option> -->
 	    <!-- </md-select>	    -->
-	    {{ t.fire.Category }}
+	    <!-- {{ t.fire.Category }} -->
+	    <md-autocomplete
+	       flex
+	       md-items="item in getCats(searchText)"
+	       md-search-text="searchText"
+	       md-selected-item="t.fire.Category"
+	       md-selected-item-change="editCat(t)"
+	       placeholder="Category"
+	       >
+	      <md-item-template>
+		{{ item }}
+	      </md-item-template>
+	    </md-autocomplete>
 	  </td>
 	  <td md-cell
 	      style="max-width:30em"

@@ -6,22 +6,29 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": "https://github.com/rothlmar/spendplan",
+  "author": "Mark Rothlisberger",
   "license": "ISC",
   "devDependencies": {
-    "angular": "^1.5.5",
-    "angular-animate": "^1.5.5",
-    "angular-aria": "^1.5.5",
-    "angular-material": "^1.0.7",
-    "angular-material-data-table": "^0.10.9",
-    "angular-messages": "^1.5.5",
-    "angularfire": "^1.2.0",
-    "firebase": "^2.4.2",
-    "lodash": "^4.11.2",
-    "moment": "^2.13.0",
-    "uglifyjs": "^2.4.10"
+    "angular": "*",
+    "angular-animate": "*",
+    "angular-aria": "*",
+    "angular-material": "*",
+    "angular-material-data-table": "*",
+    "angular-messages": "*",
+    "lodash": "*",
+    "moment": "*",
+    "uglifyjs": "*"
   },
   "dependencies": {
+    "angular": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "angular-aria": "^1.5.8",
+    "angular-messages": "^1.5.8",
+    "angularfire": "^2.0.1",
+    "firebase": "^3.2.1",
+    "lodash": "^4.14.1",
+    "moment": "^2.14.1",
     "papaparse": "^4.1.2"
   }
 }
