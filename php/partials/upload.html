@@ -20,8 +20,8 @@
       	</tr>
       </thead>
       <tbody md-body>
-	<tr ng-repeat="t in tempTrans.rows">
-	  <td md-cell ng-repeat="col in t">{{ col }}</td>
+	<tr ng-repeat="t in tempTrans.rows track by $index">
+	  <td md-cell ng-repeat="col in t track by $index">{{ col }}</td>
 	</tr>
       </tbody>
     </table>
