@@ -1,5 +1,5 @@
 var angular = require('angular');
-var firebase = require('firebase');
+firebase = require('firebase');
 var angularfire = require('angularfire');
 var _ = require('lodash');
 var moment = require('moment');
@@ -219,58 +219,59 @@ angular.module('spendPlan',
     ['$scope',
      function($scope) {
      }])
-  .controller(
-    'textCtrl',
-    ['$scope','$http','$httpParamSerializerJQLike',
-     function($scope, $http, $httpParamSerializerJQLike) {
-       $scope.item = {msgs: []};
-       var acctSid = 'AC12413265d6f17562b32fd3231ff4240e';
-       var authTkn = '14865107f40af6b3629641cd87fda1a2';
-       $scope.mynum = '+447481340534';
+  // .controller(
+  //   'textCtrl',
+  //   ['$scope','$http','$httpParamSerializerJQLike',
+  //    function($scope, $http, $httpParamSerializerJQLike) {
+  //      $scope.item = {msgs: []};
+  //      var acctSid = 'AC12413265d6f17562b32fd3231ff4240e';
+  //      var authTkn = '14865107f40af6b3629641cd87fda1a2';
+  //      $scope.mynum = '+447481340534';
 
-       var getMsgs = function() {
-	 $http({
-	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
-	   method: 'GET',
-	   params: {PageSize: 100},
-	   headers: {
-	     'Content-Type': 'application/x-www-form-urlencoded',
-	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
-	   }
-	 }).then(function(rsp) {
-	   $scope.item.msgs = rsp.data.messages;
-	   angular.forEach(rsp.data.messages, function(val) {
-	     val.timestamp = moment(new Date(val.date_sent));
-	   });
-	 });
-       }
+  //      var getMsgs = function() {
+  // 	 $http({
+  // 	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
+  // 	   method: 'GET',
+  // 	   params: {PageSize: 100},
+  // 	   headers: {
+  // 	     'Content-Type': 'application/x-www-form-urlencoded',
+  // 	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
+  // 	   }
+  // 	 }).then(function(rsp) {
+  // 	   $scope.item.msgs = rsp.data.messages;
+  // 	   angular.forEach(rsp.data.messages, function(val) {
+  // 	     val.timestamp = moment(new Date(val.date_sent));
+  // 	   });
+  // 	 });
+  //      }
        
-       getMsgs();
+  //      getMsgs();
 
-       $scope.transmit = function(m) {
-	 var data = {
-	   'To': '+447456963812',
-	   'From': '+447481340534',
-	   'Body': m
-	 }
-	 $http({
-	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
-	   method: 'POST',
-	   data: $httpParamSerializerJQLike(data),
-	   headers: {
-	     'Content-Type': 'application/x-www-form-urlencoded',
-	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
-	   }
-	 }).then(function(rsp) {
-	   getMsgs()
-	 });
-       };
-     }])
+  //      $scope.transmit = function(m) {
+  // 	 var data = {
+  // 	   'To': '+447456963812',
+  // 	   'From': '+447481340534',
+  // 	   'Body': m
+  // 	 }
+  // 	 $http({
+  // 	   url: 'https://api.twilio.com/2010-04-01/Accounts/AC12413265d6f17562b32fd3231ff4240e/Messages.json',
+  // 	   method: 'POST',
+  // 	   data: $httpParamSerializerJQLike(data),
+  // 	   headers: {
+  // 	     'Content-Type': 'application/x-www-form-urlencoded',
+  // 	     'Authorization': 'Basic ' + btoa(acctSid + ':' + authTkn)
+  // 	   }
+  // 	 }).then(function(rsp) {
+  // 	   getMsgs()
+  // 	 });
+  //      };
+  //    }])
   .controller(
     'upCtrl',
     ['$scope', function($scope) {
       $scope.tempTrans = {rows: []};
-      $scope.headerSelections = ['Date', 'Amount', 'Note', 'None'];
+      // $scope.headerSelections = ['Date', 'Amount', 'Note', 'None'];
+      $scope.headerSelections = [];
       $scope.headerOptions = ['Amount',
 			      '-Amount',
 			      'Credit',
@@ -281,10 +282,40 @@ angular.module('spendPlan',
 			      'Date',
 			      'Note',
 			      'None'];
-      $scope.checkIt = function() {
-	console.log(JSON.stringify($scope.tempTrans));
+
+      $scope.kill = function(row, idx) {
+	$scope.tempTrans.rows.splice(idx, 1);
       };
 
+      var process = function(item, acctId, acct, headers) {
+	var output = {
+	  Account: acctId,
+	  Note: '',
+	  Category: '',
+	  Amount: 0
+	};
+	angular.forEach(headers, function(header, idx) {
+	  val = item[idx]
+	  if (header == 'Note') {
+	    output['Note'] += ' ' + val;
+	  } else if (header == 'Date') {
+	    output['Date'] = moment(val, acct.dldateformat).format('YYYY-MM-DD');
+	  } else if (['Amount', 'Credit', 'Debit'].indexOf(header) > -1) {
+	    output['Amount'] += (Number.parseFloat(val) || 0)
+	  } else if (['-Amount', '-Credit', '-Debit'].indexOf(header) > -1) {
+	    output['Amount'] -= (Number.parseFloat(val) || 0)
+	  }
+	});
+	output['Note'] = output['Note'].trim();
+	return output
+      };
+
+      $scope.addTxs = function(rows, acctId, headers) {
+	var acct = $scope.acctsf[acctId].fire;
+	angular.forEach(rows, function(item, idx) {
+	  $scope.tx.$add(process(item, acctId, acct, headers))
+	});
+      };
     }])
   .directive(
     'fileChooser',
@@ -297,15 +328,14 @@ angular.module('spendPlan',
 	      // 	scope.tempTrans.push(val);
 	      // })
 	      scope.tempTrans.rows = results.data;
-	      scope.$digest();
 	      // console.log('GOT ' + scope.tempTrans.length + ' ROWS');
 	      // scope.headerSelections = [];
 	      // var longest = _.maxBy(results.data, function(val) { return val.length});
 	      // for (var ctr = 0; ctr < longest; ctr++) {
 	      // 	scope.headerSelections.push('None');
 	      // }
-	      // console.log(JSON.stringify(scope.headerSelections));
-	      // console.log(scope.uploadAcct);
+	      scope.headerSelections = scope.acctsf[scope.uploadAcct].fire.dlheaders;
+	      scope.$digest();
 	    }
 	  });
 	});
