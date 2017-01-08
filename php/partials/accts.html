@@ -21,7 +21,7 @@
       <tbody md-body>
 	<tr ng-repeat="(k, a) in acctsf">
 	  <td md-cell>{{ a.fire.name }}</td>
-	  <td md-cell>{{ balance(a.tx, acctDate) | currency:a.sym }}</td>
+	  <td md-cell ng-click="showIt(a.tx)">{{ balance(a.tx, acctDate) | currency:a.sym }}</td>
 	  <td md-cell hide show-gt-xs>{{ lastdate(a.tx) | date:'shortDate' }}</td>
 	  <!-- <td md-cell hide show-gt-sm>{{ a.fire.currency }}</td> -->
 	</tr>

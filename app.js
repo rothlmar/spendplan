@@ -46,7 +46,7 @@ angular.module('spendPlan',
 	 {title: 'Upload', content: 'partials/upload.html'},
 	 // {title: 'Text', content: 'partials/text.html'}
        ];
-       
+
        $scope.authData = null;
        var auth = $firebaseAuth();
        $scope.authData = auth.$getAuth();
@@ -77,75 +77,84 @@ angular.module('spendPlan',
 	   if (maxdate) {
 	     var maxdatestr = moment(maxdate).format('YYYY-MM-DD');
 	     txFiltered = _.filter(txFiltered,function(val) {
-	       return val.fire.Date <= maxdatestr;
+	       return val.Date <= maxdatestr;
 	     });
 	   }
 	   if (mindate) {
 	     var mindatestr = moment(mindate).format('YYYY-MM-DD');
 	     txFiltered = _.filter(txFiltered, function(val) {
-	       return val.fire.Date >= mindatestr;
+	       return val.Date >= mindatestr;
 	     });
 	   }
-	   var whichAmount = inDollars?'AmountUSD':'fire.Amount';
+	   var whichAmount = inDollars?'_amountUSD':'Amount';
 	   return _.sumBy(txFiltered, whichAmount);
 	 };
 	 
 	 $scope.lastdate = function(tx) {
-	   var last = _.maxBy(tx, 'fire.Date');
+	   var last = _.maxBy(tx, 'Date');
 	   if (last) {
-	     return last.fire.Date;
+	     return last.Date;
 	   } else {
 	     return 0;
 	   }
 	 }
 	 
 	 $scope.firstdate = function(tx) {
-	   var first = _.minBy(tx, 'fire.Date');
+	   var first = _.minBy(tx, 'Date');
 	   if (first) {
-	     return last.fire.Date;
+	     return last.Date;
 	   } else {
 	     return 0;
 	   }
 	 }
 
+	 $scope.showIt = function(l) {
+	   console.log(JSON.stringify(l));
+	 };
+
+	 // huge hack, need to fix this
+	 $scope.enrichTx = function(val) {
+	   var acct = $scope.accts[val.Account];
+	   var rate = $scope.rates[val.Date];
+
+	   val._acct = acct;
+	   if (acct.currency === 'GBP') {
+	       val._amountUSD = val.Amount/rate;
+	       val._curSym = '£'
+	   } else {
+	     val._amountUSD = val.Amount;
+	     val._curSym = '$';
+	   }
+	 };
+
+	 $scope.attachTx = function(val) {
+	   var sup = $scope.acctsf[val.Account];
+	   sup.tx.push(val);
+	   var curcat = $scope.catf[val.Category] = ($scope.catf[val.Category] || []);
+	   curcat.push(val)
+	   angular.forEach(val.Tags, function(v) {
+	     var curtag = $scope.tagf[v] = $scope.tagf[v] || [];
+	     curtag.push(val);
+	   });
+	 };
+	 
 	 $scope.rates = $firebaseObject(rateRef);
 	 $scope.categories = [];
 	 $scope.tx = $firebaseArray(txRef);
-	 $scope.txf = [];
 	 $scope.tx.$loaded().then(function(data) {
 	   angular.forEach(data, function(val) {
-	     var acct = $scope.accts[val.Account];
-	     var rate = $scope.rates[val.Date];
-	     var newrec = {
-	       fire: val,
-	       acct: acct
-	     };
-	     if (acct.currency === 'GBP') {
-	       newrec.AmountUSD = val.Amount/rate;
-	       newrec.curSym = '£'
-	     } else {
-	       newrec.AmountUSD = val.Amount;
-	       newrec.curSym = '$';
-	     }
-	     var sup = $scope.acctsf[val.Account];
-	     sup.tx.push(newrec);
-	     var curcat = $scope.catf[val.Category] = $scope.catf[val.Category] || [];
-	     curcat.push(newrec);
-	     angular.forEach(val.Tags, function(val) {
-	       var curtag = $scope.tagf[val] = $scope.tagf[val] || [];
-	       curtag.push(newrec);
-	     });
-	     $scope.txf.push(newrec);
+	     $scope.enrichTx(val);
+	     $scope.attachTx(val);
 	   });
 	   $scope.categories = Object.keys($scope.catf);
 	   $scope.tx.$watch(function(event) {
-	     console.log(event);
-	     console.log($scope.tx.$getRecord(event.key));
+	     t = $scope.tx.$getRecord(event.key);
+	     if (t && !t.hasOwnProperty('_acct')) {
+	       $scope.enrichTx(t);
+	       $scope.attachTx(t);
+	     }
 	   });
 	 });
-	 // $scope.tx.$watch(function(event) {
-	 //   console.log(event);
-	 // });
        });
        
        $scope.login = function() {
@@ -176,18 +185,22 @@ angular.module('spendPlan',
 	 return $filter('filter')($scope.categories.sort(), srch);
        };
 
+       $scope.killTx = function(t) {
+	 $scope.tx.$remove(t);
+       };
+
        $scope.editCat = function(t) {
-	 // console.log("CATEGORY IS: " + t.fire.Category);
-	 $scope.tx.$save(t.fire);
+	 // console.log("CATEGORY IS: " + t.Category);
+	 $scope.tx.$save(t);
        };
        
        $scope.editNote = function(event, t) {
 	 var editDialog = {
-	   modelValue: t.fire.Note,
+	   modelValue: t.Note,
 	   placeholder: 'Add a note',
 	   save: function(input) {
-	     t.fire.Note = input.$modelValue;
-	     $scope.tx.$save(t.fire);
+	     t.Note = input.$modelValue;
+	     $scope.tx.$save(t);
 	   },
 	   targetEvent: event,
 	   title: 'Add a note',
@@ -319,8 +332,9 @@ angular.module('spendPlan',
       $scope.addTxs = function(rows, acctId, headers) {
 	var acct = $scope.acctsf[acctId].fire;
 	angular.forEach(rows, function(item, idx) {
-	  $scope.tx.$add(process(item, acctId, acct, headers))
+	  $scope.tx.$add(process(item, acctId, acct, headers));
 	});
+	$scope.tempTrans.rows = [];
       };
     }])
   .directive(
@@ -332,6 +346,7 @@ angular.module('spendPlan',
 	    complete: function(results) {
 	      scope.tempTrans.rows = results.data;
 	      scope.headerSelections = scope.acctsf[scope.uploadAcct].fire.dlheaders;
+	      element.val(null);
 	      scope.$digest();
 	    }
 	  });

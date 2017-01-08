@@ -12,21 +12,22 @@
 	<th md-column>Note</th>
 	<th md-column>Tags</th>
 	<th md-column>Account</th>
+	<th md-column>X</th>
       </thead>
       <tbody md-body>
 	<tr md-row
-	    ng-repeat="t in txf | 
-		       orderBy:'-fire.Date' | 
+	    ng-repeat="t in tx | 
+		       orderBy:'-Date' | 
 		       limitTo:txPage.limit:(txPage.num -1)*txPage.limit" >
 	  <!-- md-select="t" -->
 	  <!-- md-select-id="t.fire.$id"> -->
-	  <td md-cell>{{ t.fire.Date | date:'shortDate' }}</td>
+	  <td md-cell>{{ t.Date | date:'shortDate' }}</td>
 	  <td md-cell>
-	    <div ng-if="t.acct.currency !== 'USD'">
-	      {{ t.fire.Amount | currency:t.curSym}}
+	    <div ng-if="t._acct.currency !== 'USD'">
+	      {{ t.Amount | currency:t._curSym}}
 	    </div>
 	    <div>
-	      {{ t.AmountUSD | currency}}
+	      {{ t._amountUSD | currency}}
 	    </div>
 	  </td>
 	  <td md-cell
@@ -43,7 +44,7 @@
 	       flex
 	       md-items="item in getCats(searchText)"
 	       md-search-text="searchText"
-	       md-selected-item="t.fire.Category"
+	       md-selected-item="t.Category"
 	       md-selected-item-change="editCat(t)"
 	       placeholder="Category"
 	       >
@@ -55,13 +56,14 @@
 	  <td md-cell
 	      style="max-width:30em"
 	      ng-click="editNote($event, t)">
-	    {{ t.fire.Note }}
+	    {{ t.Note }}
 	  </td>
 	  <td md-cell
 	      style="min-width:10em">
-	    {{ t.fire.Tags.join(',')}}
+	    {{ t.Tags.join(',')}}
 	  </td>
-	  <td md-cell>{{ t.acct.name }}</td>
+	  <td md-cell>{{ t._acct.name }}</td>
+	  <td md-cell ng-click="killTx(t)">X</td>
 	</tr>
       </tbody>
     </table>
@@ -69,7 +71,7 @@
   <md-table-pagination
      md-page="txPage.num"
      md-limit="txPage.limit"
-     md-total="{{ txf.length }}"
+     md-total="{{ tx.length }}"
      md-page-select="true">
   </md-table-pagination>
 </div>

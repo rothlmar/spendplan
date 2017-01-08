@@ -12,7 +12,7 @@
       </thead>
       <tbody md-body>
 	<tr ng-repeat="(tag, tx) in tagf">
-	  <td md-cell>{{ tag }}</td>
+	  <td md-cell ng-click="showIt(tx)">{{ tag }}</td>
 	  <td md-cell>{{ balance(tx, false, false, true) | currency }}</td>
 	</tr>
       </tbody>
