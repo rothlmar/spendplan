@@ -114,8 +114,7 @@ angular.module('spendPlan',
 	 $scope.txf = [];
 	 $scope.tx.$loaded().then(function(data) {
 	   angular.forEach(data, function(val) {
-	     var modAcct = val.Account.substring(1);
-	     var acct = $scope.accts[val.Account] || $scope.accts[modAcct];
+	     var acct = $scope.accts[val.Account];
 	     var rate = $scope.rates[val.Date];
 	     var newrec = {
 	       fire: val,
@@ -128,7 +127,7 @@ angular.module('spendPlan',
 	       newrec.AmountUSD = val.Amount;
 	       newrec.curSym = '$';
 	     }
-	     var sup = $scope.acctsf[val.Account] || $scope.acctsf[modAcct];
+	     var sup = $scope.acctsf[val.Account];
 	     sup.tx.push(newrec);
 	     var curcat = $scope.catf[val.Category] = $scope.catf[val.Category] || [];
 	     curcat.push(newrec);
@@ -139,7 +138,14 @@ angular.module('spendPlan',
 	     $scope.txf.push(newrec);
 	   });
 	   $scope.categories = Object.keys($scope.catf);
+	   $scope.tx.$watch(function(event) {
+	     console.log(event);
+	     console.log($scope.tx.$getRecord(event.key));
+	   });
 	 });
+	 // $scope.tx.$watch(function(event) {
+	 //   console.log(event);
+	 // });
        });
        
        $scope.login = function() {
@@ -171,7 +177,7 @@ angular.module('spendPlan',
        };
 
        $scope.editCat = function(t) {
-	 console.log("CATEGORY IS: " + t.fire.Category);
+	 // console.log("CATEGORY IS: " + t.fire.Category);
 	 $scope.tx.$save(t.fire);
        };
        
@@ -324,16 +330,7 @@ angular.module('spendPlan',
 	element.on('change', function(evt) {
 	  Papa.parse(evt.target.files[0], {
 	    complete: function(results) {
-	      // angular.forEach(results.data, function(val) {
-	      // 	scope.tempTrans.push(val);
-	      // })
 	      scope.tempTrans.rows = results.data;
-	      // console.log('GOT ' + scope.tempTrans.length + ' ROWS');
-	      // scope.headerSelections = [];
-	      // var longest = _.maxBy(results.data, function(val) { return val.length});
-	      // for (var ctr = 0; ctr < longest; ctr++) {
-	      // 	scope.headerSelections.push('None');
-	      // }
 	      scope.headerSelections = scope.acctsf[scope.uploadAcct].fire.dlheaders;
 	      scope.$digest();
 	    }
