@@ -315,14 +315,16 @@ angular.module('spendPlan',
 	  Amount: 0
 	};
 	angular.forEach(headers, function(header, idx) {
-	  val = item[idx]
+	  var val = item[idx]
 	  if (header == 'Note') {
 	    output['Note'] += ' ' + val;
 	  } else if (header == 'Date') {
 	    output['Date'] = moment(val, acct.dldateformat).format('YYYY-MM-DD');
 	  } else if (['Amount', 'Credit', 'Debit'].indexOf(header) > -1) {
+	    val = val.replace(/[^\d.-]/g,'');
 	    output['Amount'] += (Number.parseFloat(val) || 0)
 	  } else if (['-Amount', '-Credit', '-Debit'].indexOf(header) > -1) {
+	    val = val.replace(/[^\d.-]/g,'');
 	    output['Amount'] -= (Number.parseFloat(val) || 0)
 	  }
 	});

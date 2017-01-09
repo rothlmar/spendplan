@@ -11,13 +11,17 @@
 	<th md-column>Category</th>
 	<th md-column>Note</th>
 	<th md-column>Tags</th>
-	<th md-column>Account</th>
+	<th md-column>
+	  <div>Account</div>
+	  <div><input type="text" ng-model="acctFilter"></div>
+	</th>
 	<th md-column>X</th>
       </thead>
       <tbody md-body>
 	<tr md-row
 	    ng-repeat="t in tx | 
 		       orderBy:'-Date' | 
+		       filter:acctFilter |
 		       limitTo:txPage.limit:(txPage.num -1)*txPage.limit" >
 	  <!-- md-select="t" -->
 	  <!-- md-select-id="t.fire.$id"> -->
