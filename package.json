@@ -15,9 +15,9 @@
     "uglifyjs": "*"
   },
   "dependencies": {
-    "angular": "<1.6",
-    "angular-animate": "<1.6",
-    "angular-aria": "<1.6",
+    "angular": ">=1.8.0",
+    "angular-animate": "^1.7.2",
+    "angular-aria": "^1.7.2",
     "angular-messages": "*",
     "angular-mocks": "*",
     "angular-route": "*",
@@ -27,6 +27,6 @@
     "firebase": "~3",
     "lodash": "^4.14.1",
     "moment": "^2.14.1",
-    "papaparse": "^4.1.2"
+    "papaparse": ">=5.2.0"
   }
 }
