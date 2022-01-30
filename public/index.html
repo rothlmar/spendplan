@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="spendPlan">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SpendPlan, New and Improved</title>
+    <link rel="stylesheet" href="angular-material.min.css">
+    <link rel="stylesheet" href="md-data-table.min.css">
+    <script src="bundle.min.js"></script>
+    <style>
+      .mymsg {
+      text-align: right;
+      }
+    </style>
+
+  </head>
+  
+  <body ng-controller="MainCtrl">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+	<h2 class="md-flex">SpendPlan</h2>
+      </div>
+    </md-toolbar>
+    <md-content layout-padding>
+      <div ng-hide="authData">
+	<md-input-container>
+	  <label>Username</label>
+	  <input type="text" ng-model="creds.email">
+	</md-input-container>
+	<md-input-container>
+	  <label>Password</label>
+	  <input type="password" ng-model="creds.password">
+	</md-input-container>
+	<md-button class="md-raised md-primary" ng-click="login()">
+	  Login
+	</md-button>
+      </div>
+      <div ng-show="authData">
+	<md-tabs md-dynamic-height md-border-bottom>
+	  <md-tab ng-repeat="tab in tabs"
+		  label="{{ tab.title }}">
+	    <md-content layout="row">
+	      <ng-include src="tab.content"
+			  class="md-padding"
+			  layout="row"
+			  layout-align="center"
+			  flex>
+	      </ng-include>
+	    </md-content>
+	  </md-tab>
+	</md-tabs>
+      </div>
+    </md-content>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col-sm-6 col-sm-offset-2">
+    <h2>Accounts</h2>
+    <div style="margin-bottom:.25em">
+      <div class="row">
+	<div class="col-md-6">
+	  <p class="input-group">
+	    <input type="text"
+		   class="form-control"
+		   placeholder="Date"
+		   datepicker-popup="MM/dd/yyyy"
+		   ng-model="acctDate.date" 
+		   is-open="acctDate.opened"
+		   />
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-default" 
+		      ng-click="open($event,acctDate)">
+		<i class="glyphicon glyphicon-calendar"></i>
+	      </button>
+	    </span>
+	  </p>
+	</div>
+      </div>
+    </div>
+    <table class="table table-responsive table-striped table-condensed">
+      <tr ng-repeat="account in accounts">
+	<td>{{ account.name }} ({{ account.currency }})</td>
+	<td>{{ account.balance | currency:account.currency_symbol }}</td>
+      </tr>
+      <tr>
+	<td>
+	  <form class="form-inline">
+	    <input type="text"
+		   class="form-control"
+		   style="width:50%"
+	  	   placeholder="New Account"
+	  	   ng-model="newAcct.name"> 
+	    <select ng-model="newAcct.curr" class="form-control">
+	      <option value="GBP">£</option>
+	      <option value="USD">$</option>
+	    </select>
+	  </form>
+	</td>
+	<td>
+	  <button ng-click="addAccount()" class="btn btn-default">Add</button>
+	</td>
+      </tr>
+    </table>
+  </div>
+</div>

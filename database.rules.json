@@ -1,0 +1,6 @@
+{
+  "rules": {
+    ".read": "auth != null && auth.uid == 'e350285e-3b67-41cb-94b4-31732fa55375'",
+    ".write": "auth != null && auth.uid == 'e350285e-3b67-41cb-94b4-31732fa55375'"
+  }
+}

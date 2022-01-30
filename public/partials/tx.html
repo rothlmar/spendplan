@@ -1,0 +1,98 @@
+<div flex
+     flex-gt-sm="90"
+     ng-controller="txCtrl">
+  <md-table-container flex>
+    <!-- <table md-table md-row-select="true" ng-model="txSelected"> -->
+    <table md-table>
+      <thead md-head>
+	<th md-column>Date</th>
+	<th md-column>
+	  Amount
+	  <br>
+	  <input type="text" ng-model="search.min" placeholder="min">
+	  <br>
+	  <input type="text" ng-model="search.max" placeholder="max">
+	</th>
+	<th md-column>
+	  Category ($^ for empty)
+	  <br>
+	  <input type="text" ng-model="search.cat">
+	</th>
+	<th md-column>
+	  Note
+	  <br>
+	  <input type="text" ng-model="search.note">
+	</th>
+	<th md-column>Tags</th>
+	<th md-column>
+	  Account
+	  <br>
+	  <input type="text" ng-model="search.acct">
+	</th>
+	<th md-column>Delete</th>
+      </thead>
+      <tbody md-body>
+	<tr md-row
+	    ng-repeat="t in tx | 
+		       orderBy:'-Date' | 
+		       transactions:search |
+		       limitTo:txPage.limit:(txPage.num -1)*txPage.limit" >
+	  <!-- md-select="t" -->
+	  <!-- md-select-id="t.fire.$id"> -->
+	  <td id="{{ t.$id }}" md-cell>{{ t.Date | date:'shortDate' }}</td>
+	  <td md-cell>
+	    <div ng-if="t._acct.currency !== 'USD'">
+	      {{ t.Amount | currency:t._curSym}}
+	    </div>
+	    <div>
+	      {{ t._amountUSD | currency}}
+	    </div>
+	  </td>
+	  <td md-cell
+	      style="min-width:8em">
+	    <!-- <md-select ng-model="t.fire.Category" -->
+	    <!-- 	   ng-change="tx.$save(t.fire)" -->
+	    <!-- 	   placeholder="Uncategorized"> -->
+	    <!--   <md-option ng-value="cat" ng-repeat="cat in categories | orderBy:'toString'"> -->
+	    <!--     {{ cat }} -->
+	    <!--   </md-option> -->
+	    <!-- </md-select>	    -->
+	    <!-- {{ t.fire.Category }} -->
+	    <md-autocomplete
+	       flex
+	       md-items="item in getCats(searchText)"
+	       md-search-text="searchText"
+	       md-selected-item="t.Category"
+	       md-selected-item-change="editCat(t)"
+	       md-require-match="false"
+	       ng-blur="editCatOnBlur(t, searchText)"
+	       placeholder="Category"
+	       >
+	      <md-item-template>
+		{{ item }}
+	      </md-item-template>
+	    </md-autocomplete>
+	  </td>
+	  <td md-cell
+	      style="max-width:30em"
+	      ng-click="editNote($event, t)">
+	    {{ t.Note }}
+	  </td>
+	  <td md-cell
+	      style="min-width:10em"
+	      ng-click="editTags($event, t)">
+	    {{ t.Tags.join(',')}}
+	  </td>
+	  <td md-cell>{{ t._acct.name }}</td>
+	  <td md-cell ng-click="killTx(t)">X</td>
+	</tr>
+      </tbody>
+    </table>
+  </md-table-container>
+  <md-table-pagination
+     md-page="txPage.num"
+     md-limit="txPage.limit"
+     md-total="{{ tx.length }}"
+     md-page-select="true">
+  </md-table-pagination>
+</div>
